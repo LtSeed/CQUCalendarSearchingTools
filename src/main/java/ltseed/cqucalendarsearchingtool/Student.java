@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import static ltseed.cqucalendarsearchingtool.Main.*;
@@ -14,7 +16,7 @@ public class Student {
     int id;
     List<Class> classes;
 
-    public static Student requestStudent(int id){
+    public static Student requestStudent(int id) {
         String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/" + id;
         Map<String,String> pr = new HashMap<>();
         JSONObject info = new JSONObject();

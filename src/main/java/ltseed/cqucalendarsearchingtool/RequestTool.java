@@ -1,24 +1,28 @@
 package ltseed.cqucalendarsearchingtool;
 
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.python.util.PythonInterpreter;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestTool {
+
     /**
      * 发送get请求
      *
      * @param url   请求URL
      * @param header header
-     * @return
+     * @return result, null when can not connect to Internet
      */
     public static String doGet(String url, Map<String, String> header) {
 
@@ -41,7 +45,15 @@ public class RequestTool {
             }
 
             // 执行请求
-            response = httpClient.execute(httpGet);
+            try {
+                response = httpClient.execute(httpGet);
+            } catch (ClientProtocolException e){
+                System.out.println(e.getLocalizedMessage());
+                return null;
+            } catch (IOException e) {
+                System.out.println("网络连接失败，请检查网络！");
+                return null;
+            }
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
                 resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
@@ -61,5 +73,10 @@ public class RequestTool {
         return resultString;
     }
 
+    public static void login(String user,String password){
+        PythonInterpreter pi = new PythonInterpreter();
+        pi.execfile("F:\\login.py");
+        
+    }
 }
 

@@ -21,6 +21,13 @@ import java.util.List;
 public class IcsFileParser {
 
     public static final File ICS_FOLDER = new File("F:\\ics-out");
+    public static final ZoneId CQ;
+    static {
+        TimeZoneRegistry registry = OutlookTimeZoneRegistryFactory.getInstance().createRegistry();
+        TimeZone timezone = registry.getTimeZone("Asia/Chongqing");
+        CQ = timezone.toZoneId();
+    }
+
     public static void outputIcsFileFromClasses(List<Class> classes, String name) throws IOException {
         List<VEvent> list = new ArrayList<>();
         for (Class aClass : classes) {
@@ -49,7 +56,7 @@ public class IcsFileParser {
     public static List<VEvent> getWeekAlarm(){
         List<VEvent> week_alarm = new ArrayList<>();
         for (int i = 1; i <= 18; i++) {
-            ZoneId tz = getZoneId(TimeZoneRegistryFactory.getInstance());
+            ZoneId tz = getZoneId();
             UidGenerator ug = new RandomUidGenerator();
             Uid uid = ug.generateUid();
             String eventSummary = "第"+i+"周";
@@ -67,7 +74,7 @@ public class IcsFileParser {
     }
 
     public static VEvent getClassEvent(String name, ClassTime time, int week, String location, String description){
-        ZoneId tz = getZoneId(OutlookTimeZoneRegistryFactory.getInstance());
+        ZoneId tz = getZoneId();
         LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(time.getStartTime(week).getTime()), tz);
         LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(time.getEndTime(week).getTime()), tz);
         VEvent event = new VEvent();
@@ -78,7 +85,7 @@ public class IcsFileParser {
     }
 
     public static VEvent getDayEvent(String name, int week, int week_day, String location, String description){
-        ZoneId tz = getZoneId(OutlookTimeZoneRegistryFactory.getInstance());
+        ZoneId tz = getZoneId();
         LocalDateTime d_time = LocalDateTime.ofInstant(Instant.ofEpochMilli(ClassTime.FIRST_DAY.getTime()+
                 (week-1)* ChronoUnit.WEEKS.getDuration().toMillis() +
                 (week_day-1)* ChronoUnit.DAYS.getDuration().toMillis()), tz);
@@ -99,9 +106,7 @@ public class IcsFileParser {
         return event;
     }
 
-    private static ZoneId getZoneId(TimeZoneRegistryFactory Instance) {
-        TimeZoneRegistry registry = Instance.createRegistry();
-        TimeZone timezone = registry.getTimeZone("Asia/Chongqing");
-        return timezone.toZoneId();
+    private static ZoneId getZoneId() {
+        return CQ;
     }
 }

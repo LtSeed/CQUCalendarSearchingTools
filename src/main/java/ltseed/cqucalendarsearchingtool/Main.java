@@ -4,37 +4,47 @@ import net.fortuna.ical4j.model.component.VEvent;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 
+import static ltseed.cqucalendarsearchingtool.IcsFileParser.outputIcsFileFromClasses;
+
+@SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class Main {
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjQzOTAxMDEsInVzZXJfbmFtZSI6IjMwMDExNjM5IiwiYXV0aG9yaXRpZXMiOlsi5a2m55SfJktSX1NNUyJdLCJqdGkiOiJhYTNlOTgyMC03Y2ViLTQyOGItOTg4Zi1mNGJjYzVjYzFkMDQiLCJjbGllbnRfaWQiOiJlbnJvbGwtcHJvZCIsInNjb3BlIjpbImFsbCJdfQ.UclVuSRI-BG1uPU0ePsGOeXXULRn07JegvrgxA1B9J4";
-    public static String Cookie = "FSSBBIl1UgzbN7NO=5Ffb8XvhTt4THlTe_.CYSq6xPvXAQPvYk.1WsX3AGRM2hPREXNWtj7_RzGCex.Z.MAR9TcsJJyP100ZNBdfMefq; Hm_lvt_fbbe8c393836a313e189554e91805a69=1662825907,1663225094,1663334331; enable_FSSBBIl1UgzbN7N=true; FSSBBIl1UgzbN7NP=53upFdCW0KyAqqqDkfEJCWGIvWQGsWFSUjddKv9r3pvl2rlM4HfQZWXCWIgqDcKFroOGhcza6mDOCDSZdJD5uys_4C0wsbGzv09iM4dJ3LVdxBRjPQ.HHdlPUFrdiQyMqrZQdIuGE__s1sosadtsmqv0b4.3vcCgH.0oUVS_UeQVAokzZVrMlClgJ_pSYYns2DYDOOc66QrfAQLoyH5A.xBBhl6h8YZSc.1AVPNkq.A4jDLRobKLB7UD0t.kCV2XKEFElZDzhnGWvYuXl.uVdM0; SESSION=NWY3YWYwNGEtODNiYS00MDM2LTk5NjQtNGVmYzdjYjEwNWQ4";
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjQ2NTE5NjMsInVzZXJfbmFtZSI6IjMwMDExNjM5IiwiYXV0aG9yaXRpZXMiOlsi5a2m55SfJktSX1NNUyJdLCJqdGkiOiJjYTdiNzczZC1hMzhjLTQ0NGEtOTA5Yi1kZjFlYmU1ZjdhMzQiLCJjbGllbnRfaWQiOiJ0aW1ldGFibGUtcHJvZCIsInNjb3BlIjpbImFsbCJdfQ.vIHEdO7bNXWYpZuUaylVZETxDOZVTKUYME7xrYFUcrw";
+    public static String Cookie = "FSSBBIl1UgzbN7NO=5Ffb8XvhTt4THlTe_.CYSq6xPvXAQPvYk.1WsX3AGRM2hPREXNWtj7_RzGCex.Z.MAR9TcsJJyP100ZNBdfMefq; Hm_lvt_fbbe8c393836a313e189554e91805a69=1662825907,1663225094,1663334331; SESSION=NDg1OGIyMTUtNWJmNS00OGM1LTkxOGYtMWVhYWRkMTFiMjk4; FSSBBIl1UgzbN7NP=53ufReKWgKL0qqqDk2reLaqE4vQoNu42PuTuacVOc2snKMpDQvQejGRWEFWKO7VFF3FBb.YxgiN3DuMlhuoKIiqQFMzsCVX4mzYmvkwRzuyjDQdS0Z.JCM2.g6augD3d9jbcr9wn1sqSSGX3JotlJ2AoZEbiBLiS8knEZdV5g59ak_7scOKRbg4P.Gd1VvMuR9C2eYOrigbPPHeT.D1EvVf2zdFUCbcETaBWhokMRg7Fgotr9cm7i_wI7i5mmyhwFH1HhJaIPImKg04s7Mq1abpFMZ.53JyA99ALySo9FTWUA";
+    public static void main(String[] args) throws IOException {
 
-//        Student student = Student.requestStudent(20212192);
-//        assert student != null;
-//        List<Class> w = new ArrayList<>(student.classes);
-//        student = Student.requestStudent(20214565);
-//        assert student != null;
-//        w.addAll(student.classes);
-//        IcsFileParser.outputIcsFileFromClasses(w,"adding");
+        Scanner s = new Scanner(System.in);
+        while (true){
+            Student student = Student.requestStudent(s.nextInt());
+            assert student != null;
+            outputIcsFileFromClasses(student.classes, String.valueOf(student.id));
+            System.out.println("done");
+        }
 
-
-//        try {
-//            for (int i = 20190000; i < 20197000; i++) {
-//                System.out.println(i);
-//                Student.getStudent(i);
-//                if(i%500==0)Save.saveStudentInfo();
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Thread.sleep(100000000000000L);
-
+/*
+        assert student != null;
+        List<Class> w = new ArrayList<>(student.classes);
+        student = Student.requestStudent(20214565);
+        assert student != null;
+        w.addAll(student.classes);
+        IcsFileParser.outputIcsFileFromClasses(w,"adding");
+        try {
+            for (int i = 20190000; i < 20197000; i++) {
+                System.out.println(i);
+                Student.getStudent(i);
+                if(i%500==0)Save.saveStudentInfo();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Thread.sleep(100000000000000L);
         countPeopleTime();
+*/
+
+
     }
 
     /**
@@ -65,6 +75,12 @@ public class Main {
                 }
             }
             IcsFileParser.outputIcsFileFromEvent(count,"count");
+            System.out.println("是否打开文件？（y/n）");
+            String q = scanner.next();
+            if(q.equalsIgnoreCase("y")){
+                Runtime.getRuntime().exec("count.ics",null,IcsFileParser.ICS_FOLDER);
+            }
+            System.out.println("操作已经完成！");
             return;
         }
         System.out.println("请输入查询星期（1-7）");

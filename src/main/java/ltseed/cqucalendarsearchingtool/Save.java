@@ -13,7 +13,8 @@ public class Save {
         saveStudentInfo(null);
     }
     public static void saveStudentInfo(List<Student> list) throws IOException {
-        if(!SAVE_FOLDER.exists()) SAVE_FOLDER.createNewFile();
+        if(!SAVE_FOLDER.exists()) //noinspection ResultOfMethodCallIgnored
+            SAVE_FOLDER.createNewFile();
         if(list != null)
             for (Student student : list) {
                 addSave(student);
@@ -26,6 +27,7 @@ public class Save {
         new Thread(()->{
             try {
                 File file1 = new File(SAVE_FOLDER, file);
+                //noinspection ResultOfMethodCallIgnored
                 file1.createNewFile();
                 BufferedWriter bw = new BufferedWriter(new FileWriter(file1));
                 bw.write(string);
