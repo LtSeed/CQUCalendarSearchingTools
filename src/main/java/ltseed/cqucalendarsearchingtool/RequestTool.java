@@ -35,7 +35,6 @@ public class RequestTool {
             // 创建uri
             URIBuilder builder = new URIBuilder(url);
             URI uri = builder.build();
-
             // 创建http GET请求
             HttpGet httpGet = new HttpGet(uri);
             if (header != null) {

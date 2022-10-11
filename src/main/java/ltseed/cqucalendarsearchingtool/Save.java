@@ -36,15 +36,32 @@ public class Save {
             }
         }).start();
     }
-    public static String read(String file){
+    public static void write(String string, File file){
+        new Thread(()->{
+            try {
+                //noinspection ResultOfMethodCallIgnored
+                file.createNewFile();
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+                bw.write(string);
+                bw.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    public static String read(File file){
         StringBuilder sb = new StringBuilder();
         try {
-            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Save.SAVE_FOLDER,file))));
+            BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             sb.append(bf.readLine());
         } catch (IOException e) {
             e.printStackTrace();
         }
         return sb.toString();
+    }
+    public static String read(String file){
+        return read(new File(Save.SAVE_FOLDER,file));
     }
 
     public static void addSave(Student n) {

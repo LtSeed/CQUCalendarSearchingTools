@@ -139,18 +139,18 @@ public class TimePeriod {
         JSONObject time = getTime(id);
         start = Integer.parseInt(time.getString("startTime"));
         end = Integer.parseInt(time.getString("endTime"));
-        time_code = encode_TimePeriod(start,end);
+        time_code = encodeTimePeriod(start,end);
     }
 
     TimePeriod(int start, int end){
-        time_code = encode_TimePeriod(start, end);
+        time_code = encodeTimePeriod(start, end);
     }
 
     TimePeriod(String code){
         time_code = code;
     }
 
-    private String encode_TimePeriod(int start, int end) {
+    private String encodeTimePeriod(int start, int end) {
         final String time_code;
         StringBuilder sb = new StringBuilder();
         int max = 0;
@@ -175,8 +175,6 @@ public class TimePeriod {
             if(value.in(start))start_c = start;
             if(value.in(end))end_c = end;
         }
-
-
         String code = encodeTime(start_c,end_c).toString();
         return isIn(code);
     }

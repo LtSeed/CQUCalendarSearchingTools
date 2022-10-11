@@ -13,8 +13,23 @@ import java.util.*;
 import static ltseed.cqucalendarsearchingtool.Main.*;
 
 public class Student {
+    public static JSONObject students_info;
+    static {
+        File students_json = new File("F:\\students.json");
+        students_info = JSONObject.parseObject(Save.read(students_json));
+    }
     int id;
     List<Class> classes;
+
+    public static String getStudentIdByName(String name){
+        for (Map.Entry<String, Object> entry : students_info.entrySet()) {
+            Object o = entry.getValue();
+            assert o instanceof JSONObject;
+            JSONObject info = (JSONObject) o;
+            if(info.getString("name").equals(name)) return info.getString("id");
+        }
+        return null;
+    }
 
     public static Student requestStudent(int id) {
         String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/" + id;
@@ -79,10 +94,13 @@ public class Student {
         return s;
     }
 
-    public List<Class> getClassesByWeek(int week){
-        List<Class> list = new ArrayList<>();
+    public List<Class.ClassOfAStudent> getClassesByWeek(int week,String owner){
+        List<Class.ClassOfAStudent> list = new ArrayList<>();
         for (Class aClass : classes) {
-            if(aClass.class_time.isWeek(week)) list.add(aClass);
+            if(aClass.class_time.isWeek(week)) {
+                Class.ClassOfAStudent data = new Class.ClassOfAStudent(aClass,owner);
+                list.add(data);
+            }
         }
         return list;
     }

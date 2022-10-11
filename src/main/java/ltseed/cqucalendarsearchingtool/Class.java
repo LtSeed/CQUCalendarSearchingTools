@@ -4,6 +4,7 @@ package ltseed.cqucalendarsearchingtool;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.fortuna.ical4j.model.component.VEvent;
+import org.python.antlr.ast.Str;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +21,21 @@ public class Class {
     String[] teacher;
     JSONObject origen_info;
 
+    public static class ClassOfAStudent extends Class{
+        String owner;
+
+        public ClassOfAStudent(String s, String s1, int start_week, int end_week, int weekday, int class_time, String classroom) {
+            super(s, s1, start_week, end_week, weekday, class_time, classroom);
+        }
+        public ClassOfAStudent(JSONObject jsonObject) {
+            super(jsonObject);
+        }
+
+        public ClassOfAStudent(Class aClass, String owner) {
+            super(aClass);
+            this.owner = owner;
+        }
+    }
     public List<VEvent> exportToIcs(){
         List<VEvent> result = new ArrayList<>();
         for (int i = 0; i < class_time.week_code.length(); i++) {
@@ -28,6 +44,14 @@ public class Class {
                 else result.add(getClassEvent(class_name, class_time, i, classroom, getClassDescription()));
         }
         return result;
+    }
+
+    public Class(Class copy) {
+        this.class_time = copy.class_time;
+        this.classroom = copy.classroom;
+        this.class_name = copy.class_name;
+        this.teacher = copy.teacher;
+        this.origen_info = copy.origen_info;
     }
 
     private String getClassDescription() {
@@ -63,6 +87,11 @@ public class Class {
             teacher[i] = teachers.getJSONObject(i).getString("instructorName");
         }
         class_time = new ClassTime(jsonObject);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 
     public void show() {
