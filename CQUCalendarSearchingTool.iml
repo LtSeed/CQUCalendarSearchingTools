@@ -25,6 +25,20 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.alibaba:easyexcel:3.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:easyexcel-core:3.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.alibaba:easyexcel-support:3.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
+    <orderEntry type="library" name="Maven: com.zaxxer:SparseBitSet:1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.19" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.06" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:4.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:3.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-csv:1.8" level="project" />
+    <orderEntry type="library" name="Maven: org.ehcache:ehcache:3.9.9" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.32" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.enterprise:cdi-api:2.0.SP1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.el:javax.el-api:3.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.interceptor:javax.interceptor-api:1.2" level="project" />
@@ -44,7 +58,6 @@
     <orderEntry type="library" name="Maven: org.python:jython-standalone:2.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.mnode.ical4j:ical4j-zoneinfo-outlook:2.1.4" level="project" />
     <orderEntry type="library" name="Maven: org.mnode.ical4j:ical4j:4.0.0-beta1" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.4" level="project" />
     <orderEntry type="library" name="Maven: commons-validator:commons-validator:1.7" level="project" />
@@ -54,5 +67,6 @@
     <orderEntry type="library" name="Maven: org.threeten:threeten-extra:1.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.jooq:jool-java-8:0.9.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.24" level="project" />
   </component>
 </module>

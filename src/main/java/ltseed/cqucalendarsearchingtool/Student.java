@@ -1,8 +1,13 @@
 package ltseed.cqucalendarsearchingtool;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -13,13 +18,109 @@ import java.util.*;
 import static ltseed.cqucalendarsearchingtool.Main.*;
 
 public class Student {
-    public static JSONObject students_info;
+
+    public static final JSONObject students_info;
+    public static final JSONObject ban_wei_info;
+    public static final JSONObject nian_ji_zhi_wu;
     static {
         File students_json = new File("F:\\students.json");
         students_info = JSONObject.parseObject(Save.read(students_json));
+        ban_wei_info = null;
+        nian_ji_zhi_wu = null;
     }
-    int id;
-    List<Class> classes;
+
+    public Student(Student a) {
+        this.id = a.id;
+        this.classes = a.classes;
+    }
+
+    public boolean hasWork(){
+        return ban_wei_info.containsKey(String.valueOf(id)) ||
+                nian_ji_zhi_wu.containsKey(String.valueOf(id));
+    }
+
+    public String getWork(){
+        if(nian_ji_zhi_wu.containsKey(String.valueOf(id)))
+            return nian_ji_zhi_wu.getString(String.valueOf(id));
+        if(ban_wei_info.containsKey(String.valueOf(id)))
+            return ban_wei_info.getString(String.valueOf(id));
+        return null;
+    }
+
+    @Getter
+    @Setter
+    @EqualsAndHashCode(callSuper = false)
+    public static class StudentWithMoreInfo extends Student{
+        @ExcelIgnore
+        String work;
+
+        @ExcelIgnore
+        JSONObject more_info;
+
+
+        @ExcelProperty(value = "姓名", index = 5)
+        String name;
+        @ExcelProperty(value = "学院", index = 0)
+        String deptName;
+        @ExcelProperty(value = "学号", index = 4)
+        String userId;
+        @ExcelProperty(value = "行政班级", index = 2)
+        String adminClass;
+        @ExcelProperty(value = "专业", index = 3)
+        String major;
+        @ExcelProperty(value = "年级", index = 1)
+        String grade;
+        @ExcelProperty(value = "电话号码", index = 6)
+        String phone;
+        @ExcelProperty(value = "绩点", index = 7)
+        String gpa;
+
+        public boolean hasWork(){
+            return work != null;
+        }
+        public String getWork(){
+            return work;
+        }
+
+        StudentWithMoreInfo(File jsonfile) throws FileNotFoundException {
+            super(jsonfile);
+            if(super.hasWork()) work = super.getWork();
+        }
+
+        StudentWithMoreInfo(Student a){
+            super(a);
+        }
+
+        public void getData() {
+            /* {"deptName":"机械与运载工程学院",
+        "finishCredit":"0.0",
+        "major":"机械设计制造及其自动化（智能制造方向）",
+        "phone":"13551586682",
+        "totalCredit":"170.5",
+        "grade":"2021",
+        "name":"黄明宇",
+        "gpa":"3.0381",
+        "adminClass":"21机自（智造）03",
+        "userId":"20213128"} */
+            try {
+                name = more_info.getString("name");
+                deptName = more_info.getString("deptName");
+                adminClass = more_info.getString("adminClass");
+                major = more_info.getString("major");
+                grade = more_info.getString("grade");
+                phone = more_info.getString("phone");
+                gpa = more_info.getString("gpa");
+                userId = more_info.getString("userId");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @ExcelIgnore
+    final int id;
+    @ExcelIgnore
+    final List<Class> classes;
 
     public static String getStudentIdByName(String name){
         for (Map.Entry<String, Object> entry : students_info.entrySet()) {
@@ -31,8 +132,85 @@ public class Student {
         return null;
     }
 
-    public static Student requestStudent(int id) {
-        String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/" + id;
+    public static StudentWithMoreInfo requestStudent(int id){
+        return requestStudent(String.valueOf(id));
+    }
+
+    public static StudentWithMoreInfo requestStudent(String idOrName){
+
+        StudentWithMoreInfo student = new StudentWithMoreInfo(Student.requestStudentClasses(idOrName));
+        if(student.classes == null) return null;
+        if(student.classes.size() == 0) return null;
+        String url = "https://my.cqu.edu.cn/api/workspace/stud/personal-info/";
+        if(student.id == -1){
+            return student;
+        }
+        url = url + student.id;
+        Map<String,String> pr = new HashMap<>();
+        JSONObject info = new JSONObject();
+        for (int i = 0; i < 50; i++) {
+            pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+            pr.put("Host","my.cqu.edu.cn");
+            pr.put("Referer","http://my.cqu.edu.cn/enroll/CourseStuSelectionList");
+            pr.put("Accept","application/json, text/plain, */*");
+            pr.put("Accept-Encoding","gzip, deflate");
+            pr.put("Connection","keep-alive");
+            pr.put("Authorization",Authorization);
+            pr.put("Cookie",Cookie);
+            info = JSON.parseObject(RequestTool.doGet(url, pr));
+            if(DEBUG&&info!=null) System.out.println(info);
+            if(info != null) break;
+        }
+        assert info != null;
+        student.more_info = info.getJSONObject("data");
+        url = "https://my.cqu.edu.cn/api/workspace/stud/self-check/";
+        url = url + student.id;
+        pr = new HashMap<>();
+        info = new JSONObject();
+        for (int i = 0; i < 50; i++) {
+            pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+            pr.put("Host","my.cqu.edu.cn");
+            pr.put("Referer","http://my.cqu.edu.cn/enroll/CourseStuSelectionList");
+            pr.put("Accept","application/json, text/plain, */*");
+            pr.put("Accept-Encoding","gzip, deflate");
+            pr.put("Connection","keep-alive");
+            pr.put("Authorization",Authorization);
+            pr.put("Cookie",Cookie);
+            info = JSON.parseObject(RequestTool.doGet(url, pr));
+            if(DEBUG&&info!=null) System.out.println(info);
+            if(info != null) break;
+        }
+        if(student.more_info == null) return null;
+        assert info != null;
+        if(info.getJSONObject("data") != null)
+            student.more_info.putAll(info.getJSONObject("data"));
+        student.getData();
+        //System.out.println(student.more_info);
+        System.out.println(idOrName+" GET DA ZE!");
+        return student;
+    }
+
+    public static Student requestStudentClasses(int id){
+        return requestStudentClasses(String.valueOf(id));
+    }
+
+    public static Student requestStudentClasses(String idOrName) {
+        int id;
+        String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/";
+        if(idOrName.contains("2")){
+            id = Integer.parseInt(idOrName);
+            url = url + idOrName;
+        } else {
+            String studentIdByName = getStudentIdByName(idOrName);
+            if(studentIdByName != null){
+                id = Integer.parseInt(studentIdByName);
+                url = url + id;
+            } else {
+                id = -1;
+                url = url + idOrName;
+            }
+        }
+        //System.out.println(url);
         Map<String,String> pr = new HashMap<>();
         JSONObject info = new JSONObject();
         for (int i = 0; i < 50; i++) {
@@ -55,6 +233,10 @@ public class Student {
     }
 
     public static Student getStudent(int id){
+        return getStudent(String.valueOf(id));
+    }
+
+    public static Student getStudent(String id){
         if(Save.SAVE_FOLDER.exists()){
             JSONObject info = null;
             if(new File(Save.SAVE_FOLDER,id+".json").exists()){
@@ -63,9 +245,9 @@ public class Student {
 
             if(info != null){
                 if (info.containsKey(String.valueOf(id))){
-                    return new Student(id,info.getJSONArray(String.valueOf(id)));
+                    return new Student(Integer.parseInt(id),info.getJSONArray(String.valueOf(id)));
                 } else {
-                    Student n = Student.requestStudent(id);
+                    Student n = Student.requestStudentClasses(Integer.parseInt(id));
                     if (n != null) {
                         Save.addSave(n);
                         System.out.println("adding");
@@ -74,7 +256,7 @@ public class Student {
                 }
 
             } else {
-                Student n = Student.requestStudent(id);
+                Student n = Student.requestStudentClasses(Integer.parseInt(id));
                 if (n != null) {
                     Save.addSave(n);
                     System.out.println("adding");
@@ -87,7 +269,7 @@ public class Student {
         try {
             s = new Student(new File(FOLDER,id+".json"));
         } catch (FileNotFoundException e) {
-            s = requestStudent(id);
+            s = requestStudentClasses(Integer.parseInt(id));
         }
         assert s != null;
         Save.addSave(s);
@@ -119,7 +301,7 @@ public class Student {
     public void decode(String json){
         JSONObject info = JSON.parseObject(json);
         JSONArray classes_info = info.getJSONArray("classInfo");
-        classes = new ArrayList<>();
+
         for (int i = 0; i < classes_info.size(); i++) {
             /*
             * {"className": "工程力学I 郭开元",
@@ -159,6 +341,7 @@ public class Student {
         Scanner scanner = new Scanner(new BufferedInputStream(new FileInputStream(jsonfile)),"gbk");
         while(scanner.hasNextLine())sb.append(scanner.nextLine());
         if(Main.DEBUG) System.out.println(sb);
+        classes = new ArrayList<>();
         this.decode(sb.toString());
     }
 
