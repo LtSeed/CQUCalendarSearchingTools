@@ -25,7 +25,7 @@ public class Student {
     public static final JSONObject nian_ji_zhi_wu;
     static {
         File students_json = new File("F:\\students.json");
-        students_info = JSONObject.parseObject(Save.read(students_json));
+        students_info = null;
         ban_wei_info = null;
         nian_ji_zhi_wu = null;
     }

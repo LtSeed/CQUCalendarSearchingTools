@@ -13,7 +13,7 @@ public class ClassTime {
     static {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         try {
-            FIRST_DAY = sdf.parse("2022-08-29 00:00:00");
+            FIRST_DAY = sdf.parse("2023-02-20 00:00:00");
         } catch (ParseException e) {
             e.printStackTrace();
         }

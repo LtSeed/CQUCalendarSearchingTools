@@ -6,7 +6,6 @@ import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.*;
 import net.fortuna.ical4j.util.RandomUidGenerator;
 import net.fortuna.ical4j.util.UidGenerator;
-import net.fortuna.ical4j.zoneinfo.outlook.OutlookTimeZoneRegistryFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,10 +19,10 @@ import java.util.List;
 
 public class IcsFileParser {
 
-    public static final File ICS_FOLDER = new File("F:\\ics-out");
+    public static final File ICS_FOLDER = new File("D:\\ics-out");
     public static final ZoneId CQ;
     static {
-        TimeZoneRegistry registry = OutlookTimeZoneRegistryFactory.getInstance().createRegistry();
+        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
         TimeZone timezone = registry.getTimeZone("Asia/Chongqing");
         CQ = timezone.toZoneId();
     }
@@ -40,6 +39,7 @@ public class IcsFileParser {
     public static void outputIcsFileFromEvent(List<VEvent> events, String name) throws IOException {
         File new_file = new File(ICS_FOLDER,name+".ics");
         //noinspection ResultOfMethodCallIgnored
+        new_file.getParentFile().mkdirs();
         new_file.createNewFile();
         Calendar calendar = new Calendar().withDefaults().getFluentTarget();
         List<Property> plist = new ArrayList<>();
