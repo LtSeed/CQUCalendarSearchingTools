@@ -11,7 +11,21 @@ public class Score {
 
     List<ScoreForOneTerm> terms = new ArrayList<>();
 
-    class ScoreForOneTerm{
+    public double countAvengeScore(String termName) {
+        double result = 0;
+        double credit = 0;
+        for (ScoreForOneTerm term : terms) {
+            if(term.termName.equals(termName)){
+                for (ScoreForOneClass scoreForOneClass : term.clazz_list) {
+                    result += scoreForOneClass.credit * scoreForOneClass.effectiveScore;
+                    if(scoreForOneClass.effectiveScore != 0) credit+=scoreForOneClass.credit;
+                }
+            }
+        }
+        return result / credit;
+    }
+
+    static class ScoreForOneTerm{
         List<ScoreForOneClass> clazz_list = new ArrayList<>();
         String year;
         double totCredit;
@@ -29,7 +43,7 @@ public class Score {
         }
     }
 
-    class ScoreForOneClass{
+    static class ScoreForOneClass{
         final String attendance;
         final String courseCode;
         final String courseModuleType;

@@ -1,9 +1,15 @@
 package ltseed.cqucalendarsearchingtool;
 
 import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelReader;
+import com.alibaba.excel.read.metadata.ReadSheet;
+import com.alibaba.excel.read.metadata.ReadWorkbook;
 import com.alibaba.fastjson.JSONObject;
 import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,11 +35,12 @@ public class Main {
         //System.out.println(getJsonObjectFromMY("https://my.cqu.edu.cn/api/sam/score/student/score/", new HashMap<>(), new JSONObject()));
         //System.out.println(requestStudent(20212192).more_info);
         //IcsFileParser.outputIcsFileFromClasses(Objects.requireNonNull(requestStudentClasses("20212192")).classes,"1");
-        StudentWithMoreInfo m = Student.requestStudent(20212192);
-        System.out.println(m.more_info);
-        m.requestScore();
-        Score score = m.getScore();
-        System.out.println(score);
+//        StudentWithMoreInfo m = Student.requestStudent(20212192);
+//        System.out.println(m.more_info);
+//        m.requestScore();
+//        Score score = m.getScore();
+//        System.out.println(score);
+        countScore();
         //assert a != null;
         //a.showAllClass();
 //        Scanner s = new Scanner(System.in);
@@ -72,7 +79,54 @@ public class Main {
     }
 
     private static void countScore(){
+        Workbook w;
+        try {
+            w = new XSSFWorkbook(new File("F:\\机械学院名单.xlsx"));
+        } catch (IOException | InvalidFormatException e) {
+            e.printStackTrace();
+            return;
+        }
 
+        Sheet sheet = w.getSheet("sheet1");
+        short topRow = sheet.getTopRow();
+        Row t = sheet.getRow(topRow);
+
+        List<String> title =  new ArrayList<>();
+        for (Cell cell : t) {
+            Comment string = cell.getCellComment();
+            if(string != null)
+            title.add(string.getString().getString());
+        }
+        System.out.println(title);
+        List<List<String>> data = new ArrayList<>();
+        for (int i = sheet.getFirstRowNum() + 1; i < sheet.getLastRowNum(); i++) {
+            Row r = sheet.getRow(i);
+            List<String> student = new ArrayList<>();
+            for (Cell cell : r) {
+                Comment string = cell.getCellComment();
+                if(string != null)
+                    student.add(string.getString().getString());
+            }
+            data.add(student);
+        }
+        List<String> xuehao = new ArrayList<>();
+        int r = title.indexOf("学号");
+        for (List<String> datum : data) {
+            xuehao.add(datum.get(r));
+        }
+        for (String s : xuehao) {
+            StudentWithMoreInfo stu;
+            try {
+                stu = Student.requestStudent(Integer.parseInt(s));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            }
+            stu.requestScore();
+            Score score = stu.getScore();
+            double avengeScore = score.countAvengeScore("2022年秋");
+            System.out.println(stu.name+" "+avengeScore);
+        }
     }
 
     /**
