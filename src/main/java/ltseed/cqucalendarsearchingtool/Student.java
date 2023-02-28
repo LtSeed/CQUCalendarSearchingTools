@@ -17,6 +17,7 @@ import java.util.*;
 
 import static ltseed.cqucalendarsearchingtool.Main.*;
 
+@Getter
 public class Student {
 
     public static final JSONObject students_info;
@@ -29,9 +30,12 @@ public class Student {
         nian_ji_zhi_wu = null;
     }
 
+    private Score score;
+
     public Student(Student a) {
         this.id = a.id;
         this.classes = a.classes;
+        this.score = a.score;
     }
 
     public boolean hasWork(){
@@ -132,11 +136,11 @@ public class Student {
         return null;
     }
 
-    public static StudentWithMoreInfo requestStudent(int id){
+    public static StudentWithMoreInfo requestStudent(int id) throws InterruptedException {
         return requestStudent(String.valueOf(id));
     }
 
-    public static StudentWithMoreInfo requestStudent(String idOrName){
+    public static StudentWithMoreInfo requestStudent(String idOrName) throws InterruptedException {
 
         StudentWithMoreInfo student = new StudentWithMoreInfo(Student.requestStudentClasses(idOrName));
         if(student.classes == null) return null;
@@ -146,27 +150,32 @@ public class Student {
             return student;
         }
         url = url + student.id;
+        if (DEBUG) {
+            System.out.println(url);
+        }
         Map<String,String> pr = new HashMap<>();
         JSONObject info = new JSONObject();
-        for (int i = 0; i < 50; i++) {
-            pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
-            pr.put("Host","my.cqu.edu.cn");
-            pr.put("Referer","http://my.cqu.edu.cn/enroll/CourseStuSelectionList");
-            pr.put("Accept","application/json, text/plain, */*");
-            pr.put("Accept-Encoding","gzip, deflate");
-            pr.put("Connection","keep-alive");
-            pr.put("Authorization",Authorization);
-            pr.put("Cookie",Cookie);
-            info = JSON.parseObject(RequestTool.doGet(url, pr));
-            if(DEBUG&&info!=null) System.out.println(info);
-            if(info != null) break;
-        }
+        info = getJsonObjectFromMY(url, pr, info);
         assert info != null;
         student.more_info = info.getJSONObject("data");
         url = "https://my.cqu.edu.cn/api/workspace/stud/self-check/";
         url = url + student.id;
         pr = new HashMap<>();
         info = new JSONObject();
+        info = getJsonObjectFromMY(url, pr, info);
+        if(student.more_info == null) return null;
+        assert info != null;
+        if(info.getJSONObject("data") != null)
+            student.more_info.putAll(info.getJSONObject("data"));
+        student.getData();
+        //System.out.println(student.more_info);
+        if (DEBUG) {
+            System.out.println(idOrName+" GET DA ZE!");
+        }
+        return student;
+    }
+
+    public static JSONObject getJsonObjectFromMY(String url, Map<String, String> pr, JSONObject info) throws InterruptedException {
         for (int i = 0; i < 50; i++) {
             pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
             pr.put("Host","my.cqu.edu.cn");
@@ -180,26 +189,23 @@ public class Student {
             if(DEBUG&&info!=null) System.out.println(info);
             if(info != null) break;
         }
-        if(student.more_info == null) return null;
-        assert info != null;
-        if(info.getJSONObject("data") != null)
-            student.more_info.putAll(info.getJSONObject("data"));
-        student.getData();
-        //System.out.println(student.more_info);
-        System.out.println(idOrName+" GET DA ZE!");
-        return student;
+        return info;
     }
 
-    public static Student requestStudentClasses(int id){
+    public static Student requestStudentClasses(int id) throws InterruptedException {
         return requestStudentClasses(String.valueOf(id));
     }
 
-    public static Student requestStudentClasses(String idOrName) {
-        int id;
+    public static Student requestStudentClasses(String idOrName) throws InterruptedException {
+        int id = 0;
         String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/";
         if(idOrName.contains("2")){
-            id = Integer.parseInt(idOrName);
-            url = url + idOrName;
+            try {
+                id = Integer.parseInt(idOrName);
+                url = url + idOrName;
+            } catch (NumberFormatException e) {
+                url = url + idOrName;
+            }
         } else {
             String studentIdByName = getStudentIdByName(idOrName);
             if(studentIdByName != null){
@@ -210,33 +216,38 @@ public class Student {
                 url = url + idOrName;
             }
         }
-        //System.out.println(url);
+        if(DEBUG) System.out.println(url);
         Map<String,String> pr = new HashMap<>();
         JSONObject info = new JSONObject();
-        for (int i = 0; i < 50; i++) {
-            pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
-            pr.put("Host","my.cqu.edu.cn");
-            pr.put("Referer","http://my.cqu.edu.cn/enroll/CourseStuSelectionList");
-            pr.put("Accept","application/json, text/plain, */*");
-            pr.put("Accept-Encoding","gzip, deflate");
-            pr.put("Connection","keep-alive");
-            pr.put("Authorization",Authorization);
-            pr.put("Cookie",Cookie);
-            info = JSON.parseObject(RequestTool.doGet(url, pr));
-            if(DEBUG&&info!=null) System.out.println(info);
-            if(info != null) break;
-        }
+        info = getJsonObjectFromMY(url, pr, info);
         if(info != null){
             JSONArray data = info.getJSONArray("data");
             return new Student(id,data);
         } else return null;
     }
+    public void requestScore(){
+        String url = "https://my.cqu.edu.cn/api/sam/statistic/dashboard/student/score-course/" + id;
+        Map<String ,String > pr = new HashMap<>();
+        pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+        pr.put("Host","my.cqu.edu.cn");
+        pr.put("Referer","https://my.cqu.edu.cn/sam/ResultInquiry");
+        pr.put("Accept","application/json, text/plain, */*");
+        pr.put("Accept-Encoding","gzip, deflate");
+        pr.put("Connection","keep-alive");
+        pr.put("Authorization",Authorization);
+        pr.put("Cookie",Cookie);
+        JSONObject info = JSON.parseObject(RequestTool.doGet(url, pr));
+        if(DEBUG&&info!=null) System.out.println(info);
+        if (info != null) {
+            score = new Score(info);
+        }
+    }
 
-    public static Student getStudent(int id){
+    public static Student getStudent(int id) throws InterruptedException {
         return getStudent(String.valueOf(id));
     }
 
-    public static Student getStudent(String id){
+    public static Student getStudent(String id) throws InterruptedException {
         if(Save.SAVE_FOLDER.exists()){
             JSONObject info = null;
             if(new File(Save.SAVE_FOLDER,id+".json").exists()){

@@ -31,7 +31,7 @@ public class IcsFileParser {
     public static void outputIcsFileFromClasses(List<Class> classes, String name) throws IOException {
         List<VEvent> list = new ArrayList<>();
         for (Class aClass : classes) {
-            list.addAll(aClass.exportToIcs());
+            list.addAll(aClass.exportToEvents());
         }
         list.addAll(getWeekAlarm());
         outputIcsFileFromEvent(list, name);

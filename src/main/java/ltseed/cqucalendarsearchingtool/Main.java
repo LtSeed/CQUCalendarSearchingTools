@@ -7,24 +7,33 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ltseed.cqucalendarsearchingtool.IcsFileParser.outputIcsFileFromClasses;
+import static ltseed.cqucalendarsearchingtool.Student.*;
 
 @SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class Main {
     public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NjYxMDUyODAsInVzZXJfbmFtZSI6IjMwMDExNjM5IiwiYXV0aG9yaXRpZXMiOlsi5a2m55SfJktSX1NNUyJdLCJqdGkiOiJmZGJiZjNiOS03NDA3LTQxMjctODgwOC0yMTVkMzY4MzJkMzQiLCJjbGllbnRfaWQiOiJlbnJvbGwtcHJvZCIsInNjb3BlIjpbImFsbCJdfQ.Tx0Rnmn40Th_kiLhVOeUqQXGlcK_bp_DLEDjCHTbXx0";
-    public static String Cookie = "FSSBBIl1UgzbN7NO=5Ffb8XvhTt4THlTe_.CYSq6xPvXAQPvYk.1WsX3AGRM2hPREXNWtj7_RzGCex.Z.MAR9TcsJJyP100ZNBdfMefq; Hm_lvt_fbbe8c393836a313e189554e91805a69=1662825907,1663225094,1663334331; enable_FSSBBIl1UgzbN7N=true; FSSBBIl1UgzbN7NP=530_DgKJif6ZqqqDk_.4fhAox5ZgtRT.jEPhxQSoV9.Wj.IkHq8I1mOVRk8u1jXzh44r.oRZepP9ovdh_Pk2vtyEwRN9K9woOSAc4ETNGCExayWy4tlXjAbfAn1RBO8FRqDmA0WSZ53imitsa3aOUO7xnS_8TYX.75VglVGGaQMuPmwpn48v9JF0ojZvxl8jIRTbbo.TQ_fVV_uchRJCLu6IcwfJUksTV_IuUKyb5orhaENgKET21mvGgkAyAA8mx6VMTfRtmsXK9s..SBGE5Zn; SESSION=NDdhNjk1ZjItN2JhOC00OWIxLTk1NjItYTYzNzNhNGUyMTBh";
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Nzc1Nzk5MDksInVzZXJfbmFtZSI6IjAyMDI0ODA5IiwiYXV0aG9yaXRpZXMiOlsi566h55CG5Li05pe25rS75Yqo55qE6L6F5a-85ZGYJktSX1RUIiwi5Zyo57yW5Lq65ZGYJktSX1NBTSIsIui-heWvvOWRmCZLUl9TTVMiLCLmlZnluIgmS1JfU0FNIl0sImp0aSI6ImVjZjRkMTM3LTBmYWEtNDI1Ny04MTc0LWUxYWJmYTVkMzQ0ZSIsImNsaWVudF9pZCI6InNhbS1wcmQiLCJzY29wZSI6WyJhbGwiXX0.eT33ja3MhfmnTKge9hOfPOCvdF34Q-LWFN2BkxwY4ZM";
+    public static String Cookie = "FSSBBIl1UgzbN7NO=5Ffb8XvhTt4THlTe_.CYSq6xPvXAQPvYk.1WsX3AGRM2hPREXNWtj7_RzGCex.Z.MAR9TcsJJyP100ZNBdfMefq; Hm_lvt_fbbe8c393836a313e189554e91805a69=1667190886; enable_FSSBBIl1UgzbN7N=true; SESSION=ODc1NDhkZmEtNjg0Ni00MzAxLTlhZmMtNGM5MjZjNzQ1ZTdm; FSSBBIl1UgzbN7NP=53dCwMKHev2ZqqqDD2.VTTqroz1SUrGKYaSf3Fhi1T0ZRWMy0tUCIRSR_bknZKI0tUZvL9mbOh3SrBKGYucnnUO922dZZR_eoKHEV9c6srOcIijJsxVEIaiF9yLKpGa01guBFNDJafdBDYTf9aL32CoBIqG.qDYHEiQ9DW5v4uc4a5d3eey0sLiD_equW3TGNaa1usXHUPB1yh5E49gof.GN_74fX0M98KXAZbZd4GN2R3sV9zhBmbZ.dfBRkHXcH5WdZRJAXASpL3.hoN_po_hOBiRMacuAh7hieiZszBOFyjRNb.cjoJtrqyQTxGItFhwnK4_cZZfd2h0SVh_1VEs";
+    public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
+
         //saveStudentInfo();
         //countPeopleTime();
         //getAllStudent();
-        Student.StudentWithMoreInfo pst = Student.requestStudent("20212002");
-        assert pst != null;
-        System.out.println(pst.more_info);
+        //System.out.println(getJsonObjectFromMY("https://my.cqu.edu.cn/api/sam/score/student/score/", new HashMap<>(), new JSONObject()));
+        //System.out.println(requestStudent(20212192).more_info);
+        //IcsFileParser.outputIcsFileFromClasses(Objects.requireNonNull(requestStudentClasses("20212192")).classes,"1");
+        StudentWithMoreInfo m = Student.requestStudent(20212192);
+        System.out.println(m.more_info);
+        m.requestScore();
+        Score score = m.getScore();
+        System.out.println(score);
         //assert a != null;
         //a.showAllClass();
 //        Scanner s = new Scanner(System.in);
@@ -62,10 +71,14 @@ public class Main {
 
     }
 
+    private static void countScore(){
+
+    }
+
     /**
      * 统计人员在该天的日程情况
      * */
-    private static void countPeopleTime() throws IOException {
+    private static void countPeopleTime() throws IOException, InterruptedException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("请分行输入所有人的学号或姓名，并以单独一行的#end结尾");
         List<Student> list = new ArrayList<>();
@@ -218,49 +231,58 @@ public class Main {
         List<Student.StudentWithMoreInfo> list = new ArrayList<>();
         AtomicInteger started = new AtomicInteger();
         List<Thread> threads = new ArrayList<>();
-        for (int i = 2021; i < 2022; i++) {
-            for (int j = 1500; j < 2000; j++) {
+        for (int i = 2022; i < 2023; i++) {
+
+            for (int j = 0; j < 7000; j++) {
                 int finalI = i;
                 int finalJ = j;
                 Thread thread = new Thread(() -> {
                     String id = finalI + StringUtils.leftPad(String.valueOf(finalJ), 4, '0');
-                    System.out.println(id);
-                    Student.StudentWithMoreInfo student = Student.requestStudent(id);
+                    try {
+                        if(Integer.parseInt(id) % 50 == 0) System.out.println(id);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    Student.StudentWithMoreInfo student = null;
+                    try {
+                        student = Student.requestStudent(id);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     if (student == null) return;
+                    System.out.println(student.id + " " + student.name);
                     list.add(student);
                 });
                 threads.add(thread);
                 thread.start();
-                while (threads.size() > 24){
-                    List<Thread> del = new ArrayList<>();
-                    for (Thread thread1 : threads) {
-                        if (!thread1.isAlive()) del.add(thread1);
-                    }
-                    for (Thread thread1 : del) {
-                        threads.remove(thread1);
-                    }
-                }
+                if(threads.size() > 100)
+                    do {
+                        List<Thread> del = new ArrayList<>();
+                        for (Thread thread1 : threads) {
+                            if (!thread1.isAlive()) del.add(thread1);
+                        }
+                        for (Thread thread1 : del) {
+                            threads.remove(thread1);
+                        }
+                        System.out.println("waiting " + threads.size());
+                        Thread.sleep(1000);
+                    } while (threads.size() >= 64);
 
             }
-        }
-        boolean flag = true;
-        while (flag) {
-            flag = false;
-            for (Thread thread : threads) {
-                if(thread.isAlive()){
-                    Thread.sleep(500);
-                    flag = true;
-                    break;
+            boolean flag = true;
+            while (flag) {
+                flag = false;
+                for (Thread thread : threads) {
+                    if(thread.isAlive()){
+                        Thread.sleep(500);
+                        flag = true;
+                        break;
+                    }
                 }
             }
+
+            EasyExcel.write("F:\\名单"+i+".xlsx", Student.StudentWithMoreInfo.class).sheet(String.valueOf(i)).doWrite(list);
+            list.clear();
         }
-        List<Student> l2 = new ArrayList<>();
-        for (Student.StudentWithMoreInfo student : list) {
-            for (Class aClass : student.classes) {
-                if(aClass.teacher[0].equals("魏珊珊")&&aClass.class_time.time_period.time_code.equals("11")&&aClass.class_time.week_day == 3)
-                    l2.add(student);
-            }
-        }
-        EasyExcel.write("F:\\名单2.xlsx", Student.StudentWithMoreInfo.class).sheet("sheet1").doWrite(l2);
     }
 }

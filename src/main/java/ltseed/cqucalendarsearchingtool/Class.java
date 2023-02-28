@@ -4,7 +4,6 @@ package ltseed.cqucalendarsearchingtool;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import net.fortuna.ical4j.model.component.VEvent;
-import org.python.antlr.ast.Str;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +35,7 @@ public class Class {
             this.owner = owner;
         }
     }
-    public List<VEvent> exportToIcs(){
+    public List<VEvent> exportToEvents(){
         List<VEvent> result = new ArrayList<>();
         for (int i = 0; i < class_time.week_code.length(); i++) {
             if(class_time.week_code.charAt(i) == '1')

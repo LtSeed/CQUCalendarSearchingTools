@@ -55,8 +55,7 @@ public class Save {
         try {
             BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
             sb.append(bf.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ignored) {
         }
         return sb.toString();
     }
