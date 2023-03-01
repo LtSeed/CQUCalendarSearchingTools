@@ -11,14 +11,34 @@ public class Score {
 
     List<ScoreForOneTerm> terms = new ArrayList<>();
 
-    public double countAvengeScore(String termName) {
+    public double countAvengeScore(String termName,String year) {
         double result = 0;
         double credit = 0;
         for (ScoreForOneTerm term : terms) {
-            if(term.termName.equals(termName)){
+            if(term.termName.equals(termName)&&term.year.equals(year)){
                 for (ScoreForOneClass scoreForOneClass : term.clazz_list) {
                     result += scoreForOneClass.credit * scoreForOneClass.effectiveScore;
                     if(scoreForOneClass.effectiveScore != 0) credit+=scoreForOneClass.credit;
+                }
+            }
+        }
+        return result / credit;
+    }
+
+    public double countGPA(String termName,String year) {
+        double result = 0;
+        double credit = 0;
+        for (ScoreForOneTerm term : terms) {
+            if(term.termName.equals(termName)&&term.year.equals(year)){
+                for (ScoreForOneClass scoreForOneClass : term.clazz_list) {
+                    double g;
+                    g = (scoreForOneClass.effectiveScore-50)/10;
+                    if(g <= 1) g = 1;
+                    if(g >= 4) g = 4;
+                    if(scoreForOneClass.effectiveScore != 0) {
+                        result += scoreForOneClass.credit * g;
+                        credit += scoreForOneClass.credit;
+                    }
                 }
             }
         }
@@ -59,13 +79,16 @@ public class Score {
             this.courseModuleType = s.getString("courseModuleType");
             this.courseName = s.getString("courseName");
             this.credit = Double.parseDouble(s.getString("credit"));
-            this.effectiveScore = s.getDouble("effectiveScore");
+            Double effectiveScore1 = s.getDouble("effectiveScore");
+            if(effectiveScore1 != null)
+                this.effectiveScore = effectiveScore1;
+            else this.effectiveScore = 0;
             this.examType = s.getString("examType");
             this.programType = s.getString("programType");
         }
     }
     Score(JSONObject score){
-        JSONArray data = score.getJSONArray("data");
+        JSONArray data = score.getJSONObject("data").getJSONArray("sessionScores");
         for (Object datum : data) {
             JSONObject d = JSON.parseObject(datum.toString());
             this.terms.add(new ScoreForOneTerm(d));

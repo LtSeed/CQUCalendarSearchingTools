@@ -1,32 +1,28 @@
 package ltseed.cqucalendarsearchingtool;
 
 import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelReader;
-import com.alibaba.excel.read.metadata.ReadSheet;
-import com.alibaba.excel.read.metadata.ReadWorkbook;
 import com.alibaba.fastjson.JSONObject;
 import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static ltseed.cqucalendarsearchingtool.IcsFileParser.outputIcsFileFromClasses;
 import static ltseed.cqucalendarsearchingtool.Student.*;
 
 @SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class Main {
     public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Nzc1Nzk5MDksInVzZXJfbmFtZSI6IjAyMDI0ODA5IiwiYXV0aG9yaXRpZXMiOlsi566h55CG5Li05pe25rS75Yqo55qE6L6F5a-85ZGYJktSX1RUIiwi5Zyo57yW5Lq65ZGYJktSX1NBTSIsIui-heWvvOWRmCZLUl9TTVMiLCLmlZnluIgmS1JfU0FNIl0sImp0aSI6ImVjZjRkMTM3LTBmYWEtNDI1Ny04MTc0LWUxYWJmYTVkMzQ0ZSIsImNsaWVudF9pZCI6InNhbS1wcmQiLCJzY29wZSI6WyJhbGwiXX0.eT33ja3MhfmnTKge9hOfPOCvdF34Q-LWFN2BkxwY4ZM";
-    public static String Cookie = "FSSBBIl1UgzbN7NO=5Ffb8XvhTt4THlTe_.CYSq6xPvXAQPvYk.1WsX3AGRM2hPREXNWtj7_RzGCex.Z.MAR9TcsJJyP100ZNBdfMefq; Hm_lvt_fbbe8c393836a313e189554e91805a69=1667190886; enable_FSSBBIl1UgzbN7N=true; SESSION=ODc1NDhkZmEtNjg0Ni00MzAxLTlhZmMtNGM5MjZjNzQ1ZTdm; FSSBBIl1UgzbN7NP=53dCwMKHev2ZqqqDD2.VTTqroz1SUrGKYaSf3Fhi1T0ZRWMy0tUCIRSR_bknZKI0tUZvL9mbOh3SrBKGYucnnUO922dZZR_eoKHEV9c6srOcIijJsxVEIaiF9yLKpGa01guBFNDJafdBDYTf9aL32CoBIqG.qDYHEiQ9DW5v4uc4a5d3eey0sLiD_equW3TGNaa1usXHUPB1yh5E49gof.GN_74fX0M98KXAZbZd4GN2R3sV9zhBmbZ.dfBRkHXcH5WdZRJAXASpL3.hoN_po_hOBiRMacuAh7hieiZszBOFyjRNb.cjoJtrqyQTxGItFhwnK4_cZZfd2h0SVh_1VEs";
+    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Nzc2OTA1MzMsInVzZXJfbmFtZSI6IjAyMDI0ODA5IiwiYXV0aG9yaXRpZXMiOlsi566h55CG5Li05pe25rS75Yqo55qE6L6F5a-85ZGYJktSX1RUIiwi5Zyo57yW5Lq65ZGYJktSX1NBTSIsIui-heWvvOWRmCZLUl9TTVMiLCLmlZnluIgmS1JfU0FNIl0sImp0aSI6IjE1YjFiMTMzLTZkYmYtNDMxYi05ZDg2LTI4NjAwMjUwZTliNCIsImNsaWVudF9pZCI6InNhbS1wcmQiLCJzY29wZSI6WyJhbGwiXX0.86EH2t5ou5SrorSxmotoU7TQQxgtVWBUrVzdkAN4aWU";
+    public static String Cookie = "redirect_uri=https://my.cqu.edu.cn/sam/cas; FSSBBIl1UgzbN7NO=5zfabSEuPCmn4hISXcAoKs8kFxFfS1q10trfjjbeZU1K6uvUTaMNYquXXcU_.HWh28Pj6fDHYH3sKB7I1Wo1wWa; Hm_lvt_fbbe8c393836a313e189554e91805a69=1671453334,1672145055,1672845300; enable_FSSBBIl1UgzbN7N=true; SESSION=YTNlNDYwNzktOTQxOC00MWUwLWFlODMtY2ExNTRkMjQ1MGUy; FSSBBIl1UgzbN7NP=53deNPbHdFb0qqqDDvMpk6GQynUq6W32fh0mw_4rRjrrQl4vLyVQecqm3mRE9kiOkh.xilKJ.PvobCO0qeSGPCYI8zP7HhXmTX.OoXf1oetXxqx6LxoikbYDbqJemGNozN0i_oeQa6CdZy83Vswqx0EwIpx6903uwnH_VjJ0K.kZvmtbp6AXU2AKPFgo_F8_P0boxmQPvetZrK0eHlyN74QQuzSrRCpfUlp4aN7jK3rynhYc5Um65C9aB8fbJAf36x1yQg8w6x92CMOW2gmIlbU";
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
 
         //saveStudentInfo();
@@ -81,31 +77,34 @@ public class Main {
     private static void countScore(){
         Workbook w;
         try {
-            w = new XSSFWorkbook(new File("F:\\机械学院名单.xlsx"));
-        } catch (IOException | InvalidFormatException e) {
+            File file = new File("D:\\nameList.xlsx");
+
+            w = new XSSFWorkbook(new FileInputStream(file));
+        } catch (IOException e) {
             e.printStackTrace();
             return;
         }
 
-        Sheet sheet = w.getSheet("sheet1");
-        short topRow = sheet.getTopRow();
+        Sheet sheet = w.getSheet("sheet0");
+        System.out.println(sheet.getLastRowNum());
+        int topRow = sheet.getFirstRowNum();
+        System.out.println(topRow);
         Row t = sheet.getRow(topRow);
-
         List<String> title =  new ArrayList<>();
-        for (Cell cell : t) {
-            Comment string = cell.getCellComment();
+        for (int i = 0; i < t.getLastCellNum(); i++) {
+            String string = t.getCell(i).getStringCellValue();
             if(string != null)
-            title.add(string.getString().getString());
+                title.add(string);
         }
         System.out.println(title);
         List<List<String>> data = new ArrayList<>();
         for (int i = sheet.getFirstRowNum() + 1; i < sheet.getLastRowNum(); i++) {
             Row r = sheet.getRow(i);
             List<String> student = new ArrayList<>();
-            for (Cell cell : r) {
-                Comment string = cell.getCellComment();
+            for (int j = 0; j < r.getLastCellNum(); j++) {
+                String string = r.getCell(j).getStringCellValue();
                 if(string != null)
-                    student.add(string.getString().getString());
+                    student.add(string);
             }
             data.add(student);
         }
@@ -114,18 +113,59 @@ public class Main {
         for (List<String> datum : data) {
             xuehao.add(datum.get(r));
         }
+        List<StudentWithMoreInfo> students = new ArrayList<>();
         for (String s : xuehao) {
             StudentWithMoreInfo stu;
             try {
                 stu = Student.requestStudent(Integer.parseInt(s));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+            } catch (Exception e) {
+                System.out.println(s);
+                continue;
+            }
+            if(stu == null){
+                System.out.println(s);
+                continue;
             }
             stu.requestScore();
             Score score = stu.getScore();
-            double avengeScore = score.countAvengeScore("2022年秋");
+            double avengeScore = score.countAvengeScore("第一学期","2022-2023学年");
             System.out.println(stu.name+" "+avengeScore);
+            try {
+                if(avengeScore > 0)
+                    students.add(stu);
+            } catch (Exception ignored) {
+            }
+        }
+        try {
+            w.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        students.sort(Comparator.comparingDouble(o->-o.getScore().countAvengeScore("第一学期","2022-2023学年")));
+        Sheet sheet1 = w.createSheet();
+        for (int i = 0; i < students.size(); i++) {
+            Row row = sheet1.createRow(i);
+            StringBuilder sb = new StringBuilder();
+            sb.append(i);
+            row.createCell(1).setCellValue(i);
+            StudentWithMoreInfo studentWithMoreInfo = students.get(i);
+            double v = studentWithMoreInfo.getScore().countAvengeScore("第一学期","2022-2023学年");
+            double gpa = studentWithMoreInfo.getScore().countGPA("第一学期","2022-2023学年");
+            sb.append(" ").append(v).append(" ").append(studentWithMoreInfo.name);
+            sb.append(" ").append(gpa);sb.append(" ").append(studentWithMoreInfo.id);
+            row.createCell(2).setCellValue(studentWithMoreInfo.id);
+            row.createCell(3).setCellValue(studentWithMoreInfo.name);
+            row.createCell(4).setCellValue(v);
+            row.createCell(5).setCellValue(gpa);
+            System.out.println(sb);
+        }
+
+        try {
+
+            w.write(new FileOutputStream("D:\\nameList.xlsx"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
