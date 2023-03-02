@@ -21,8 +21,8 @@ import static ltseed.cqucalendarsearchingtool.Student.*;
 public class Main {
     public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2Nzc2OTA1MzMsInVzZXJfbmFtZSI6IjAyMDI0ODA5IiwiYXV0aG9yaXRpZXMiOlsi566h55CG5Li05pe25rS75Yqo55qE6L6F5a-85ZGYJktSX1RUIiwi5Zyo57yW5Lq65ZGYJktSX1NBTSIsIui-heWvvOWRmCZLUl9TTVMiLCLmlZnluIgmS1JfU0FNIl0sImp0aSI6IjE1YjFiMTMzLTZkYmYtNDMxYi05ZDg2LTI4NjAwMjUwZTliNCIsImNsaWVudF9pZCI6InNhbS1wcmQiLCJzY29wZSI6WyJhbGwiXX0.86EH2t5ou5SrorSxmotoU7TQQxgtVWBUrVzdkAN4aWU";
-    public static String Cookie = "redirect_uri=https://my.cqu.edu.cn/sam/cas; FSSBBIl1UgzbN7NO=5zfabSEuPCmn4hISXcAoKs8kFxFfS1q10trfjjbeZU1K6uvUTaMNYquXXcU_.HWh28Pj6fDHYH3sKB7I1Wo1wWa; Hm_lvt_fbbe8c393836a313e189554e91805a69=1671453334,1672145055,1672845300; enable_FSSBBIl1UgzbN7N=true; SESSION=YTNlNDYwNzktOTQxOC00MWUwLWFlODMtY2ExNTRkMjQ1MGUy; FSSBBIl1UgzbN7NP=53deNPbHdFb0qqqDDvMpk6GQynUq6W32fh0mw_4rRjrrQl4vLyVQecqm3mRE9kiOkh.xilKJ.PvobCO0qeSGPCYI8zP7HhXmTX.OoXf1oetXxqx6LxoikbYDbqJemGNozN0i_oeQa6CdZy83Vswqx0EwIpx6903uwnH_VjJ0K.kZvmtbp6AXU2AKPFgo_F8_P0boxmQPvetZrK0eHlyN74QQuzSrRCpfUlp4aN7jK3rynhYc5Um65C9aB8fbJAf36x1yQg8w6x92CMOW2gmIlbU";
+    public static String Authorization = "";
+    public static String Cookie = "";
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
 
         //saveStudentInfo();
@@ -98,18 +98,21 @@ public class Main {
         }
         System.out.println(title);
         List<List<String>> data = new ArrayList<>();
+        int r = title.indexOf("学号");
+        Map<String, Integer> number = new HashMap<>();
         for (int i = sheet.getFirstRowNum() + 1; i < sheet.getLastRowNum(); i++) {
-            Row r = sheet.getRow(i);
+            Row row = sheet.getRow(i);
             List<String> student = new ArrayList<>();
-            for (int j = 0; j < r.getLastCellNum(); j++) {
-                String string = r.getCell(j).getStringCellValue();
+            for (int j = 0; j < row.getLastCellNum(); j++) {
+                String string = row.getCell(j).getStringCellValue();
                 if(string != null)
                     student.add(string);
             }
             data.add(student);
+            number.put(student.get(r),i);
         }
         List<String> xuehao = new ArrayList<>();
-        int r = title.indexOf("学号");
+
         for (List<String> datum : data) {
             xuehao.add(datum.get(r));
         }
@@ -136,11 +139,7 @@ public class Main {
             } catch (Exception ignored) {
             }
         }
-        try {
-            w.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
         students.sort(Comparator.comparingDouble(o->-o.getScore().countAvengeScore("第一学期","2022-2023学年")));
         Sheet sheet1 = w.createSheet();
         for (int i = 0; i < students.size(); i++) {
@@ -156,6 +155,11 @@ public class Main {
             row.createCell(2).setCellValue(studentWithMoreInfo.id);
             row.createCell(3).setCellValue(studentWithMoreInfo.name);
             row.createCell(4).setCellValue(v);
+            Integer rown = number.get(String.valueOf(studentWithMoreInfo.id));
+            Row row1 = sheet.getRow(rown);
+            short lastCellNum = sheet.getRow(rown).getLastCellNum();
+            row1.createCell(lastCellNum + 1).setCellValue(v);
+            row1.createCell(lastCellNum + 2).setCellValue(gpa);
             row.createCell(5).setCellValue(gpa);
             System.out.println(sb);
         }
@@ -163,7 +167,7 @@ public class Main {
         try {
 
             w.write(new FileOutputStream("D:\\nameList.xlsx"));
-
+            w.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -236,7 +240,7 @@ public class Main {
         Thread.sleep(1000);
     }
 
-    private static void saveWorkInGrand() throws IOException, InterruptedException {
+    private static void saveWorkInGrade() throws IOException, InterruptedException {
         Scanner in = new Scanner(System.in);
         String t = in.nextLine();
         JSONObject info = new JSONObject();
