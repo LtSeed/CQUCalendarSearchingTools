@@ -45,6 +45,15 @@ public class Score {
         return result / credit;
     }
 
+    public ScoreForOneTerm getTerm(String termName, String year) {
+        for (ScoreForOneTerm term : terms) {
+            if(term.termName.equals(termName)&&term.year.equals(year)){
+                return term;
+            }
+        }
+        return null;
+    }
+
     static class ScoreForOneTerm{
         List<ScoreForOneClass> clazz_list = new ArrayList<>();
         String year;

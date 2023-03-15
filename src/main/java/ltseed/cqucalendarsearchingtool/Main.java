@@ -2,6 +2,7 @@ package ltseed.cqucalendarsearchingtool;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
+import net.fortuna.ical4j.model.CalendarFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
@@ -12,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,8 +23,8 @@ import static ltseed.cqucalendarsearchingtool.Student.*;
 public class Main {
     public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization = "";
-    public static String Cookie = "";
+    public static String Authorization;
+    public static String Cookie;
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
 
         //saveStudentInfo();
@@ -36,7 +38,8 @@ public class Main {
 //        m.requestScore();
 //        Score score = m.getScore();
 //        System.out.println(score);
-        countScore();
+        exportEnrollmentInfomation();
+       // countScore();
         //assert a != null;
         //a.showAllClass();
 //        Scanner s = new Scanner(System.in);
@@ -72,6 +75,48 @@ public class Main {
 */
 
 
+    }
+
+    private static void exportEnrollmentInfomation() throws IOException {
+
+        Workbook w;
+        try {
+            File file = new File("D:\\nameList.xlsx");
+
+            w = new XSSFWorkbook(new FileInputStream(file));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        Sheet sheet = w.getSheet("sheet0");
+        System.out.println(sheet.getLastRowNum());
+        int topRow = sheet.getFirstRowNum();
+        System.out.println(topRow);
+        Row t = sheet.getRow(topRow);
+        List<String> title =  new ArrayList<>();
+        for (int i = 0; i < t.getLastCellNum(); i++) {
+            String string = t.getCell(i).getStringCellValue();
+            if(string != null)
+                title.add(string);
+        }
+        System.out.println(title);
+        int r = title.indexOf("学号");
+        List<StudentWithMoreInfo> students = new ArrayList<>();
+        for (int i = sheet.getFirstRowNum() + 1; i < sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            Cell cell = row.getCell(r);
+            try {
+                students.add(requestStudent(cell.toString()));
+            } catch (InterruptedException e) {
+                System.out.println(cell);
+            }
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd", Locale.CHINA);
+        File f = new File("D:\\" + sdf.format(new Date()) +".xlsx");
+        f.createNewFile();
+        EasyExcel.write(f, Student.StudentWithMoreInfo.class).sheet("sheet1").doWrite(students);
     }
 
     private static void countScore(){
@@ -117,7 +162,9 @@ public class Main {
             xuehao.add(datum.get(r));
         }
         List<StudentWithMoreInfo> students = new ArrayList<>();
+        int i1=1;
         for (String s : xuehao) {
+            System.out.println(i1++);
             StudentWithMoreInfo stu;
             try {
                 stu = Student.requestStudent(Integer.parseInt(s));
@@ -131,8 +178,8 @@ public class Main {
             }
             stu.requestScore();
             Score score = stu.getScore();
+            if(score == null) continue;
             double avengeScore = score.countAvengeScore("第一学期","2022-2023学年");
-            System.out.println(stu.name+" "+avengeScore);
             try {
                 if(avengeScore > 0)
                     students.add(stu);
@@ -143,18 +190,31 @@ public class Main {
         students.sort(Comparator.comparingDouble(o->-o.getScore().countAvengeScore("第一学期","2022-2023学年")));
         Sheet sheet1 = w.createSheet();
         for (int i = 0; i < students.size(); i++) {
-            Row row = sheet1.createRow(i);
+            Row row = sheet1.createRow(i+1);
             StringBuilder sb = new StringBuilder();
             sb.append(i);
-            row.createCell(1).setCellValue(i);
+            row.createCell(0).setCellValue(i+1);
             StudentWithMoreInfo studentWithMoreInfo = students.get(i);
-            double v = studentWithMoreInfo.getScore().countAvengeScore("第一学期","2022-2023学年");
-            double gpa = studentWithMoreInfo.getScore().countGPA("第一学期","2022-2023学年");
+            Score score = studentWithMoreInfo.getScore();
+            double v = score.countAvengeScore("第一学期","2022-2023学年");
+            double gpa = score.countGPA("第一学期","2022-2023学年");
             sb.append(" ").append(v).append(" ").append(studentWithMoreInfo.name);
             sb.append(" ").append(gpa);sb.append(" ").append(studentWithMoreInfo.id);
-            row.createCell(2).setCellValue(studentWithMoreInfo.id);
-            row.createCell(3).setCellValue(studentWithMoreInfo.name);
-            row.createCell(4).setCellValue(v);
+            row.createCell(1).setCellValue(studentWithMoreInfo.id);
+            row.createCell(2).setCellValue(studentWithMoreInfo.name);
+            row.createCell(3).setCellValue(v);
+            Score.ScoreForOneTerm scoreForOneTerm = score.getTerm("第一学期", "2022-2023学年");
+            if (scoreForOneTerm==null) {
+                continue;
+            }
+            List<Score.ScoreForOneClass> clazz_list = scoreForOneTerm.clazz_list;
+            for (int j = 0; j < clazz_list.size(); j++) {
+                Score.ScoreForOneClass scoreForOneClass = clazz_list.get(j);
+                int c = j * 3 + 4;
+                row.createCell(c).setCellValue(scoreForOneClass.courseName);
+                row.createCell(c+1).setCellValue(scoreForOneClass.credit);
+                row.createCell(c+2).setCellValue(scoreForOneClass.effectiveScore);
+            }
             Integer rown = number.get(String.valueOf(studentWithMoreInfo.id));
             Row row1 = sheet.getRow(rown);
             short lastCellNum = sheet.getRow(rown).getLastCellNum();
@@ -165,7 +225,6 @@ public class Main {
         }
 
         try {
-
             w.write(new FileOutputStream("D:\\nameList.xlsx"));
             w.close();
         } catch (IOException e) {

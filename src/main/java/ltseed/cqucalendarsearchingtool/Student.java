@@ -1,18 +1,20 @@
 package ltseed.cqucalendarsearchingtool;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.*;
+import org.apache.poi.xssf.usermodel.XSSFPicture;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
 import static ltseed.cqucalendarsearchingtool.Main.*;
@@ -29,7 +31,7 @@ public class Student {
         ban_wei_info = null;
         nian_ji_zhi_wu = null;
     }
-
+    @ExcelIgnore
     private Score score;
 
     public Student(Student a) {
@@ -37,6 +39,8 @@ public class Student {
         this.classes = a.classes;
         this.score = a.score;
     }
+
+    public Student() {}
 
     public boolean hasWork(){
         return ban_wei_info.containsKey(String.valueOf(id)) ||
@@ -54,7 +58,12 @@ public class Student {
     @Getter
     @Setter
     @EqualsAndHashCode(callSuper = false)
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class StudentWithMoreInfo extends Student{
+
+        StudentWithMoreInfo(){
+            super();
+        }
         @ExcelIgnore
         String work;
 
@@ -78,6 +87,97 @@ public class Student {
         String phone;
         @ExcelProperty(value = "绩点", index = 7)
         String gpa;
+        @ExcelProperty(value = "照片", index = 8)
+        private String studentImageUrl;
+        @ExcelIgnore
+        @JsonIgnore
+        private BufferedImage image = null;
+
+        {
+            try {
+                image = RequestTool.readImage(studentImageUrl);
+            } catch (IOException ignored) {
+            }
+        }
+
+        @ExcelProperty(value = "姓名拼音", index = 9)
+        private String studentNamePy;
+        @ExcelProperty(value = "婚姻状况", index = 10)
+        private String maritalStatus;
+        @ExcelProperty(value = "性别", index = 11)
+        private String gender;
+        @ExcelProperty(value = "生日", index = 12)
+        private String birthday;
+        @ExcelProperty(value = "政治面貌", index = 13)
+        private String politicalStatus;
+        @ExcelProperty(value = "民族", index = 14)
+        private String nationality;
+        @ExcelProperty(value = "证件类型", index = 15)
+        private String idType;
+        @ExcelProperty(value = "证件号码", index = 16)
+        private String idNumber;
+        @ExcelProperty(value = "邮箱", index = 17)
+        private String email;
+        @ExcelProperty(value = "统一认证号", index = 18)
+        private String authId;
+        @ExcelProperty(value = "家庭电话", index = 19)
+        private String familyPhone;
+        @ExcelProperty(value = "家庭邮政编码", index = 20)
+        private String homeAddressZipCode;
+        @ExcelProperty(value = "家庭住址", index = 21)
+        private String homeAddress;
+        @ExcelProperty(value = "学位", index = 22)
+        private String degree;
+
+        @ExcelProperty(value = "学制", index = 23)
+        private String learningForm;
+
+        @ExcelProperty(value = "学籍情况", index = 24)
+        private String stuEnrollmentStatusName;
+
+        @ExcelProperty(value = "入学时间", index = 25)
+        private String enrollmentTime;
+        @ExcelProperty(value = "生源地", index = 26)
+        private String stuSourceRegion;
+        @ExcelProperty(value = "生源单位", index = 27)
+        private String stuSourceUnit;
+        @ExcelProperty(value = "现校区", index = 28)
+        private String campusName;
+        @ExcelProperty(value = "获取学籍时间", index = 29)
+        private String obtainSchoolRollTime;
+        @ExcelProperty(value = "宿舍", index = 30)
+        private String dormitoryAddress;
+        @ExcelProperty(value = "特长", index = 31)
+        private String strongPoint;
+
+
+        @ExcelProperty(value = "辅修专业", index = 32)
+        private String minorMajorName;
+
+        @ExcelProperty(value = "辅修专业所在学院", index = 33)
+        private String minorDeptName;
+
+        @ExcelProperty(value = "专业排名", index = 34)
+        private int majorRanking;
+
+        @ExcelProperty(value = "大班id", index = 36)
+        private String largeClassId;
+        @ExcelProperty(value = "大班名", index = 37)
+        private String largeClassName;
+
+        @ExcelIgnore
+        private List<Label> studentLabels;
+        @ExcelIgnore
+        private List<Object> studentPunish;
+        @ExcelIgnore
+        private List<AcademicAlert> studentAcademicAlert;
+        @ExcelIgnore
+        private List<CommonApply> studentCommonApply;
+        @ExcelIgnore
+        private List<Object> studentCommonApplyHistory;
+        @ExcelProperty(value = "QQ", index = 35)
+        private String qq;
+
 
         public boolean hasWork(){
             return work != null;
@@ -96,16 +196,6 @@ public class Student {
         }
 
         public void getData() {
-            /* {"deptName":"机械与运载工程学院",
-        "finishCredit":"0.0",
-        "major":"机械设计制造及其自动化（智能制造方向）",
-        "phone":"13551586682",
-        "totalCredit":"170.5",
-        "grade":"2021",
-        "name":"黄明宇",
-        "gpa":"3.0381",
-        "adminClass":"21机自（智造）03",
-        "userId":"20213128"} */
             try {
                 name = more_info.getString("name");
                 deptName = more_info.getString("deptName");
@@ -119,12 +209,72 @@ public class Student {
                 e.printStackTrace();
             }
         }
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @Data
+        static class Label {
+            private String id = null;
+            private String name = null;
+            private String studentId = null;
+            private String description = null;
+            private String activeFlag = null;
+
+
+            Label(String id, String name, String studentId, String description,String activeFlag) {
+                this.id = id;
+                this.name = name;
+                this.studentId = studentId;
+                this.description = description;
+                this.activeFlag = activeFlag;
+            }
+        }
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @Data
+        static class AcademicAlert {
+            private String sessionYear;
+            private String sessionTerm;
+            private String acquireCredit;
+            private String warnOrder;
+
+            AcademicAlert(String sessionYear, String sessionTerm, String acquireCredit, String warnOrder) {
+                this.sessionYear = sessionYear;
+                this.sessionTerm = sessionTerm;
+                this.acquireCredit = acquireCredit;
+                this.warnOrder = warnOrder;
+            }
+
+        }
+
+        @Getter
+        @Setter
+        @NoArgsConstructor
+        @Data
+        static class CommonApply {
+            private String applyId;
+            private String applyType;
+            private String applyTime;
+            private String documentNum;
+
+            CommonApply(String applyId, String applyType, String applyTime, String documentNum) {
+                this.applyId = applyId;
+                this.applyType = applyType;
+                this.applyTime = applyTime;
+                this.documentNum = documentNum;
+            }
+
+            // getter 和 setter 方法
+        }
     }
 
     @ExcelIgnore
-    final int id;
+    int id;
     @ExcelIgnore
-    final List<Class> classes;
+    List<Class> classes = new ArrayList<>();
 
     public static String getStudentIdByName(String name){
         for (Map.Entry<String, Object> entry : students_info.entrySet()) {
@@ -143,36 +293,82 @@ public class Student {
     public static StudentWithMoreInfo requestStudent(String idOrName) throws InterruptedException {
 
         StudentWithMoreInfo student = new StudentWithMoreInfo(Student.requestStudentClasses(idOrName));
-        if(student.classes == null) return null;
-        if(student.classes.size() == 0) return null;
-        String url = "https://my.cqu.edu.cn/api/workspace/stud/personal-info/";
+        if(student.classes == null) {
+            System.out.println("N1");
+            return null;
+        }
+        if(student.classes.size() == 0) {
+            System.out.println("N2");
+            return null;
+        }
+
         if(student.id == -1){
             return student;
         }
-        url = url + student.id;
-        if (DEBUG) {
-            System.out.println(url);
+
+        String url;
+        JSONObject info;
+        student.more_info = new JSONObject();
+
+        url = "https://my.cqu.edu.cn/api/workspace/stud/personal-info/";
+        info = getJsonObjectFromJY(student, url);
+
+        try {
+            if (info == null) {
+                if(DEBUG) System.out.println("N3");
+            } else student.more_info.putAll(info.getJSONObject("data"));
+        } catch (NullPointerException ignore) {
         }
-        Map<String,String> pr = new HashMap<>();
-        JSONObject info = new JSONObject();
-        info = getJsonObjectFromMY(url, pr, info);
-        assert info != null;
-        student.more_info = info.getJSONObject("data");
+
         url = "https://my.cqu.edu.cn/api/workspace/stud/self-check/";
+        info = getJsonObjectFromJY(student, url);
+
+        try {
+            if((info != null ? info.getJSONObject("data") : null) != null) {
+                student.more_info.putAll(info.getJSONObject("data"));
+                student.getData();
+            }
+        } catch (NullPointerException ignored) {
+        }
+
+        url = "https://my.cqu.edu.cn/api/shunt/student/management/enrollment/";
+        info = getJsonObjectFromJY(student, url);
+
+        try {
+            if((info != null ? info.getJSONObject("data") : null) != null)
+                student.more_info.putAll(info.getJSONObject("data"));
+        } catch (NullPointerException ignored) {
+        }
+
+
+        if (DEBUG) {
+            System.out.println(student.more_info);
+            System.out.println(idOrName+" GET DA ZE!");
+        }
+        ObjectMapper om = new ObjectMapper();
+        StudentWithMoreInfo studentWithMoreInfo = null;
+        try {
+            studentWithMoreInfo = om.readValue(student.more_info.toJSONString(), StudentWithMoreInfo.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        if (studentWithMoreInfo != null) {
+            studentWithMoreInfo.more_info = student.more_info;
+        } else studentWithMoreInfo = student;
+        return studentWithMoreInfo;
+    }
+
+    private static JSONObject getJsonObjectFromJY(StudentWithMoreInfo student, String url) throws InterruptedException {
+        Map<String, String> pr;
+        JSONObject info;
         url = url + student.id;
         pr = new HashMap<>();
         info = new JSONObject();
         info = getJsonObjectFromMY(url, pr, info);
         if(student.more_info == null) return null;
         assert info != null;
-        if(info.getJSONObject("data") != null)
-            student.more_info.putAll(info.getJSONObject("data"));
-        student.getData();
-        //System.out.println(student.more_info);
-        if (DEBUG) {
-            System.out.println(idOrName+" GET DA ZE!");
-        }
-        return student;
+        if(DEBUG) System.out.println(info);
+        return info;
     }
 
     public static JSONObject getJsonObjectFromMY(String url, Map<String, String> pr, JSONObject info) throws InterruptedException {
@@ -238,9 +434,9 @@ public class Student {
         pr.put("Cookie",Cookie);
         JSONObject info = JSON.parseObject(RequestTool.doGet(url, pr));
         if(DEBUG&&info!=null) System.out.println(info);
-        if (info != null) {
+        if (info != null && info.getJSONObject("data") != null) {
             score = new Score(info);
-        }
+        } else score = null;
     }
 
     public static Student getStudent(int id) throws InterruptedException {

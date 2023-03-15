@@ -10,8 +10,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 
 public class RequestTool {
@@ -126,7 +133,20 @@ public class RequestTool {
         return resultString;
     }
 
+    public static BufferedImage readImage(String imgUrl) throws IOException {
+        URL url = null;
+        InputStream is = null;
+        ByteArrayOutputStream outStream = null;
+        HttpURLConnection httpUrl = null;
 
+        url = new URL(imgUrl);
+        httpUrl = (HttpURLConnection) url.openConnection();
+        httpUrl.connect();
+
+
+        return ImageIO.read(httpUrl.getInputStream());
+
+    }
 
 }
 
