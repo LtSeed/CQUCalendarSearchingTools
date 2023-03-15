@@ -7,6 +7,7 @@ import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.python.modules._functools._functools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ public class Main {
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
     public static String Authorization;
     public static String Cookie;
+    static List<StuInfoInWord> s = new ArrayList<>();
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
 
         //saveStudentInfo();
@@ -38,8 +40,14 @@ public class Main {
 //        m.requestScore();
 //        Score score = m.getScore();
 //        System.out.println(score);
-        exportEnrollmentInfomation();
-       // countScore();
+        //exportEnrollmentInfomation();
+        File folder = new File("F:\\新建文件夹\\");
+        dfs(folder);
+        EasyExcel.write("D:\\1.xlsx", StuInfoInWord.class).sheet("sheet1").doWrite(s);
+
+
+
+        // countScore();
         //assert a != null;
         //a.showAllClass();
 //        Scanner s = new Scanner(System.in);
@@ -75,6 +83,22 @@ public class Main {
 */
 
 
+    }
+
+    public static void dfs(File file) {
+        if(file.isDirectory()) {
+            for (File listFile : Objects.requireNonNull(file.listFiles())) {
+                dfs(listFile);
+            }
+        } else {
+            try {
+                StuInfoInWord read = ReadWordTable.read(file);
+                boolean b = read != null;
+                if(b)
+                    s.add(read);
+            } catch (IOException ignore) {
+            }
+        }
     }
 
     private static void exportEnrollmentInfomation() throws IOException {
