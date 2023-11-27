@@ -179,6 +179,13 @@ public class TimePeriod {
         return isIn(code);
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "'time_code':'" + time_code + '\'' +
+                '}';
+    }
+
     public int getStartTime() {
         return getClassTime(time_code.indexOf("1")+1).start;
     }

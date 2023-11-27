@@ -13,7 +13,7 @@ public class ClassTime {
     static {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         try {
-            FIRST_DAY = sdf.parse("2023-02-20 00:00:00");
+            FIRST_DAY = sdf.parse("2023-08-28 00:00:00");
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -83,4 +83,12 @@ public class ClassTime {
         return b;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "'week_code':'" + week_code + '\'' +
+                ", 'time_period':" + time_period +
+                ", 'week_day':" + week_day +
+                '}';
+    }
 }

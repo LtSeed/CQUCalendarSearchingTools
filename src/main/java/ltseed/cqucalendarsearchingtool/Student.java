@@ -31,13 +31,18 @@ public class Student {
         ban_wei_info = null;
         nian_ji_zhi_wu = null;
     }
-    @ExcelIgnore
-    private Score score;
+
+    @Override
+    public String toString() {
+        return "{" +
+                "'id':'" + id + '\'' +
+                ", 'classes':" + classes +
+                '}';
+    }
 
     public Student(Student a) {
         this.id = a.id;
         this.classes = a.classes;
-        this.score = a.score;
     }
 
     public Student() {}
@@ -177,6 +182,8 @@ public class Student {
         private List<Object> studentCommonApplyHistory;
         @ExcelProperty(value = "QQ", index = 35)
         private String qq;
+        @ExcelIgnore
+        private Score score;
 
 
         public boolean hasWork(){
@@ -269,10 +276,36 @@ public class Student {
 
             // getter 和 setter 方法
         }
+        public void requestScore(int stack){
+            String url = "https://my.cqu.edu.cn/api/sam/statistic/dashboard/student/score-course/" + id;
+            Map<String ,String > pr = new HashMap<>();
+            pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
+            pr.put("Host","my.cqu.edu.cn");
+            pr.put("Referer","https://my.cqu.edu.cn/sam/ResultInquiry");
+            pr.put("Accept","application/json, text/plain, */*");
+            pr.put("Accept-Encoding","gzip, deflate");
+            pr.put("Connection","keep-alive");
+            pr.put("Authorization",Authorization);
+            pr.put("Cookie",Cookie);
+            JSONObject info = JSON.parseObject(RequestTool.doGet(url, pr,0));
+
+            if (info != null && info.getJSONObject("data") != null) {
+                score = new Score(info);
+            } else {
+                if(info!=null&&stack == 20) {
+                    String msg = name + " " + info.get("msg") + "------------";
+                    strings.add(msg);
+                    System.out.println(msg);
+                    score = null;
+                } else {
+                    requestScore(++stack);
+                }
+            }
+        }
     }
 
     @ExcelIgnore
-    int id;
+    String id;
     @ExcelIgnore
     List<Class> classes = new ArrayList<>();
 
@@ -286,23 +319,20 @@ public class Student {
         return null;
     }
 
-    public static StudentWithMoreInfo requestStudent(int id) throws InterruptedException {
-        return requestStudent(String.valueOf(id));
-    }
 
-    public static StudentWithMoreInfo requestStudent(String idOrName) throws InterruptedException {
-
+    public static StudentWithMoreInfo requestStudent(String idOrName,int stack) throws InterruptedException {
+        if(stack == 20) return null;
         StudentWithMoreInfo student = new StudentWithMoreInfo(Student.requestStudentClasses(idOrName));
         if(student.classes == null) {
             System.out.println("N1");
-            return null;
+            return requestStudent(idOrName, ++stack);
         }
         if(student.classes.size() == 0) {
             System.out.println("N2");
-            return null;
+            return requestStudent(idOrName, ++stack);
         }
 
-        if(student.id == -1){
+        if(Objects.equals(student.id, "-1")){
             return student;
         }
 
@@ -334,15 +364,22 @@ public class Student {
         url = "https://my.cqu.edu.cn/api/shunt/student/management/enrollment/";
         info = getJsonObjectFromJY(student, url);
 
+
+
         try {
             if((info != null ? info.getJSONObject("data") : null) != null)
                 student.more_info.putAll(info.getJSONObject("data"));
         } catch (NullPointerException ignored) {
+            return null;
         }
 
+        if(student.more_info.containsKey("msg")&&student.more_info.getString("msg").equalsIgnoreCase("操作失败")){
+            student.more_info.remove("msg");
+            return requestStudent(idOrName,++stack);
+        }
 
         if (DEBUG) {
-            System.out.println(student.more_info);
+            //System.out.println(student.more_info);
             System.out.println(idOrName+" GET DA ZE!");
         }
         ObjectMapper om = new ObjectMapper();
@@ -354,6 +391,8 @@ public class Student {
         }
         if (studentWithMoreInfo != null) {
             studentWithMoreInfo.more_info = student.more_info;
+            studentWithMoreInfo.classes = student.classes;
+            studentWithMoreInfo.id = student.id;
         } else studentWithMoreInfo = student;
         return studentWithMoreInfo;
     }
@@ -381,67 +420,38 @@ public class Student {
             pr.put("Connection","keep-alive");
             pr.put("Authorization",Authorization);
             pr.put("Cookie",Cookie);
-            info = JSON.parseObject(RequestTool.doGet(url, pr));
+            info = JSON.parseObject(RequestTool.doGet(url, pr,0));
             if(DEBUG&&info!=null) System.out.println(info);
             if(info != null) break;
         }
         return info;
     }
 
-    public static Student requestStudentClasses(int id) throws InterruptedException {
-        return requestStudentClasses(String.valueOf(id));
-    }
-
     public static Student requestStudentClasses(String idOrName) throws InterruptedException {
-        int id = 0;
+        String id = idOrName;
         String url = "http://my.cqu.edu.cn/api/enrollment/timetable/student/";
-        if(idOrName.contains("2")){
-            try {
-                id = Integer.parseInt(idOrName);
-                url = url + idOrName;
-            } catch (NumberFormatException e) {
-                url = url + idOrName;
-            }
-        } else {
-            String studentIdByName = getStudentIdByName(idOrName);
-            if(studentIdByName != null){
-                id = Integer.parseInt(studentIdByName);
-                url = url + id;
-            } else {
-                id = -1;
-                url = url + idOrName;
-            }
+
+        try {
+            Integer.parseInt(idOrName);
+            id = idOrName;
+            url = url + idOrName;
+        } catch (NumberFormatException e) {
+            url = url + idOrName;
         }
+
         if(DEBUG) System.out.println(url);
         Map<String,String> pr = new HashMap<>();
         JSONObject info = new JSONObject();
         info = getJsonObjectFromMY(url, pr, info);
         if(info != null){
             JSONArray data = info.getJSONArray("data");
-            return new Student(id,data);
-        } else return null;
-    }
-    public void requestScore(){
-        String url = "https://my.cqu.edu.cn/api/sam/statistic/dashboard/student/score-course/" + id;
-        Map<String ,String > pr = new HashMap<>();
-        pr.put("User-Agent","Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36");
-        pr.put("Host","my.cqu.edu.cn");
-        pr.put("Referer","https://my.cqu.edu.cn/sam/ResultInquiry");
-        pr.put("Accept","application/json, text/plain, */*");
-        pr.put("Accept-Encoding","gzip, deflate");
-        pr.put("Connection","keep-alive");
-        pr.put("Authorization",Authorization);
-        pr.put("Cookie",Cookie);
-        JSONObject info = JSON.parseObject(RequestTool.doGet(url, pr));
-        if(DEBUG&&info!=null) System.out.println(info);
-        if (info != null && info.getJSONObject("data") != null) {
-            score = new Score(info);
-        } else score = null;
+            return new Student(id, data);
+        } else {
+            if(DEBUG) System.out.println(id + " Student null");
+            return null;
+        }
     }
 
-    public static Student getStudent(int id) throws InterruptedException {
-        return getStudent(String.valueOf(id));
-    }
 
     public static Student getStudent(String id) throws InterruptedException {
         if(Save.SAVE_FOLDER.exists()){
@@ -452,9 +462,9 @@ public class Student {
 
             if(info != null){
                 if (info.containsKey(String.valueOf(id))){
-                    return new Student(Integer.parseInt(id),info.getJSONArray(String.valueOf(id)));
+                    return new Student(id,info.getJSONArray(String.valueOf(id)));
                 } else {
-                    Student n = Student.requestStudentClasses(Integer.parseInt(id));
+                    Student n = Student.requestStudentClasses(id);
                     if (n != null) {
                         Save.addSave(n);
                         System.out.println("adding");
@@ -463,7 +473,7 @@ public class Student {
                 }
 
             } else {
-                Student n = Student.requestStudentClasses(Integer.parseInt(id));
+                Student n = Student.requestStudentClasses(id);
                 if (n != null) {
                     Save.addSave(n);
                     System.out.println("adding");
@@ -476,7 +486,7 @@ public class Student {
         try {
             s = new Student(new File(FOLDER,id+".json"));
         } catch (FileNotFoundException e) {
-            s = requestStudentClasses(Integer.parseInt(id));
+            s = requestStudentClasses(id);
         }
         assert s != null;
         Save.addSave(s);
@@ -542,8 +552,8 @@ public class Student {
 
     Student(File jsonfile) throws FileNotFoundException {
         if(jsonfile.getName().contains("."))
-            id = Integer.parseInt(jsonfile.getName().split("\\.")[0]);
-        else id = Integer.parseInt(jsonfile.getName());
+            id = jsonfile.getName().split("\\.")[0];
+        else id = jsonfile.getName();
         StringBuilder sb = new StringBuilder();
         Scanner scanner = new Scanner(new BufferedInputStream(new FileInputStream(jsonfile)),"gbk");
         while(scanner.hasNextLine())sb.append(scanner.nextLine());
@@ -552,12 +562,15 @@ public class Student {
         this.decode(sb.toString());
     }
 
-    Student(int id,JSONArray data) {
+    Student(String id,JSONArray data) {
         this.id = id;
         classes = new ArrayList<>();
         for (int i = 0; i < data.size(); i++) {
-            classes.add(new Class(data.getJSONObject(i)));
+            Class e = new Class(data.getJSONObject(i));
+            if(DEBUG) e.show();
+            classes.add(e);
         }
+        if(DEBUG) System.out.println("class size = " + data.size());
     }
 
 

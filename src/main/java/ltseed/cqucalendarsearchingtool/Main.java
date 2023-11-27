@@ -2,31 +2,34 @@ package ltseed.cqucalendarsearchingtool;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
-import net.fortuna.ical4j.model.CalendarFactory;
 import net.fortuna.ical4j.model.component.VEvent;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.python.modules._functools._functools;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static ltseed.cqucalendarsearchingtool.CourseDownloader.downloadAndSaveCourses;
 import static ltseed.cqucalendarsearchingtool.Student.*;
 
 @SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class Main {
     public static final boolean DEBUG = false;
     public static final File FOLDER = new File("F:\\CQU-class2ics-main\\conf_classInfo");
-    public static String Authorization;
-    public static String Cookie;
+    public static String Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDEwNzYyNzAsInVzZXJfbmFtZSI6IjAyMDI0ODA5IiwiYXV0aG9yaXRpZXMiOlsi566h55CG5Li05pe25rS75Yqo55qE6L6F5a-85ZGYJktSX1RUIiwi6L6F5a-85ZGYJktSX1NNUyIsIuaVmeW4iCZLUl9EUCIsIuWcqOe8luS6uuWRmCZLUl9UUE1TIl0sImp0aSI6IjlkMDA0ODMyLWFiNTYtNDNlMS1iM2E1LTRmYzdkMzQwYWFhMiIsImNsaWVudF9pZCI6InBlcnNvbmFsLXByb2QiLCJzY29wZSI6WyJhbGwiXX0.H3F-RmMNxsZZKJccv2lyD7UYyxtAOZz8_a4p9BqlsPI";
+    public static String Cookie = "FSSBBIl1UgzbN7NO=5zfabSEuPCmn4hISXcAoKs8kFxFfS1q10trfjjbeZU1K6uvUTaMNYquXXcU_.HWh28Pj6fDHYH3sKB7I1Wo1wWa; Hm_lvt_fbbe8c393836a313e189554e91805a69=1682241708; FSSBBIl1UgzbN7NP=5RKAOvbY9xi0qqqDWkn79Aa_bFt6F9fESqulKOGDRJRrSojMCjh9vh4PVNeITmJK4nlD4x6B_lQS7MRXxSlNfUaBSgcksKaWaDQPjg_sMl9mKHV8P28cVdWgfBpFbjaG4fHvB9y5iFdqA7EbagTyX4hFS8P5FAB2l3wEDVbYJHTcou6jO5luEBNB2v33AARgfZ0nJ1E5g6yN4vmWJChaRzXO2saVnia3yPiwF.OYnanEXJhzVplOwGKbV_ac65jzc9xyuq1yTI87kcacw7BdtGl; SESSION=OThhMTRhYWItNzVlMS00MmY5LWE0NmMtOTA3YzVhZTE3YWJj";
     static List<StuInfoInWord> s = new ArrayList<>();
+
+    public static List<String> strings = new ArrayList<>();
+
+    public static Integer i = 0;
     public static void main(String[] args) throws IOException, InterruptedException, URISyntaxException {
 
         //saveStudentInfo();
@@ -34,20 +37,23 @@ public class Main {
         //getAllStudent();
         //System.out.println(getJsonObjectFromMY("https://my.cqu.edu.cn/api/sam/score/student/score/", new HashMap<>(), new JSONObject()));
         //System.out.println(requestStudent(20212192).more_info);
-        //IcsFileParser.outputIcsFileFromClasses(Objects.requireNonNull(requestStudentClasses("20212192")).classes,"1");
+//        IcsFileParser.outputIcsFileFromClasses(Objects.requireNonNull(requestStudentClasses("20212192")).classes,"111");
 //        StudentWithMoreInfo m = Student.requestStudent(20212192);
 //        System.out.println(m.more_info);
 //        m.requestScore();
 //        Score score = m.getScore();
 //        System.out.println(score);
         //exportEnrollmentInfomation();
-        File folder = new File("F:\\新建文件夹\\");
-        dfs(folder);
-        EasyExcel.write("D:\\1.xlsx", StuInfoInWord.class).sheet("sheet1").doWrite(s);
+//        System.out.println(Objects.requireNonNull(requestStudentClasses("10001585")).classes);
+//        File folder = new File("F:\\新建文件夹\\");
+//        dfs(folder);
+//        EasyExcel.write("D:\\1.xlsx", StuInfoInWord.class).sheet("sheet1").doWrite(s);
+
+        downloadAndSaveCourses();
+
+//        countScore();
 
 
-
-        // countScore();
         //assert a != null;
         //a.showAllClass();
 //        Scanner s = new Scanner(System.in);
@@ -131,7 +137,7 @@ public class Main {
             Row row = sheet.getRow(i);
             Cell cell = row.getCell(r);
             try {
-                students.add(requestStudent(cell.toString()));
+                students.add(requestStudent(cell.toString(),0));
             } catch (InterruptedException e) {
                 System.out.println(cell);
             }
@@ -143,7 +149,7 @@ public class Main {
         EasyExcel.write(f, Student.StudentWithMoreInfo.class).sheet("sheet1").doWrite(students);
     }
 
-    private static void countScore(){
+    private static void countScore() throws InterruptedException {
         Workbook w;
         try {
             File file = new File("D:\\nameList.xlsx");
@@ -186,55 +192,61 @@ public class Main {
             xuehao.add(datum.get(r));
         }
         List<StudentWithMoreInfo> students = new ArrayList<>();
-        int i1=1;
-        for (String s : xuehao) {
-            System.out.println(i1++);
-            StudentWithMoreInfo stu;
-            try {
-                stu = Student.requestStudent(Integer.parseInt(s));
-            } catch (Exception e) {
-                System.out.println(s);
-                continue;
-            }
-            if(stu == null){
-                System.out.println(s);
-                continue;
-            }
-            stu.requestScore();
-            Score score = stu.getScore();
-            if(score == null) continue;
-            double avengeScore = score.countAvengeScore("第一学期","2022-2023学年");
-            try {
-                if(avengeScore > 0)
-                    students.add(stu);
-            } catch (Exception ignored) {
-            }
-        }
+        List<Thread> threads = new ArrayList<>();
 
-        students.sort(Comparator.comparingDouble(o->-o.getScore().countAvengeScore("第一学期","2022-2023学年")));
+
+        for (String s : xuehao) {
+            synchronized(i) {
+                i++;
+            }
+            System.out.println(s+" start!");
+            new Thread(()-> {
+                StudentWithMoreInfo i1 = getI1(s);
+                if(i1!=null)
+                    students.add(i1);
+                synchronized(i) {
+                    i--;
+                }
+            }).start();
+            Thread.sleep(20);
+
+        }
+        while (i > 0) {
+            System.out.println(i);
+            Thread.sleep(2000);
+        }
+        System.out.println("信息采集完毕，Enter继续");
+        Scanner scanner = new Scanner(System.in);
+        scanner.nextLine();
+
+
+        students.sort(Comparator.comparingDouble(o->-o.getScore().countAvengeScore("第二学期","2022-2023学年")));
         Sheet sheet1 = w.createSheet();
         for (int i = 0; i < students.size(); i++) {
+            System.out.println(i);
             Row row = sheet1.createRow(i+1);
             StringBuilder sb = new StringBuilder();
             sb.append(i);
             row.createCell(0).setCellValue(i+1);
             StudentWithMoreInfo studentWithMoreInfo = students.get(i);
             Score score = studentWithMoreInfo.getScore();
-            double v = score.countAvengeScore("第一学期","2022-2023学年");
-            double gpa = score.countGPA("第一学期","2022-2023学年");
-            sb.append(" ").append(v).append(" ").append(studentWithMoreInfo.name);
-            sb.append(" ").append(gpa);sb.append(" ").append(studentWithMoreInfo.id);
+            double v1 = score.countAvengeScore("第一学期","2022-2023学年");
+            double v2 = score.countAvengeScore("第二学期","2022-2023学年");
+            double vt = score.countAvengeScore("","2022-2023学年");
+//            double gpa = score.countGPA("第二学期","2022-2023学年");
+            sb.append(" ").append(v1).append(" ").append(studentWithMoreInfo.name);
+            sb.append(" ").append(v2).append(" ").append(studentWithMoreInfo.id);
             row.createCell(1).setCellValue(studentWithMoreInfo.id);
             row.createCell(2).setCellValue(studentWithMoreInfo.name);
-            row.createCell(3).setCellValue(v);
-            Score.ScoreForOneTerm scoreForOneTerm = score.getTerm("第一学期", "2022-2023学年");
+            row.createCell(3).setCellValue(v1);
+            Score.ScoreForOneTerm scoreForOneTerm = score.getTerm("第二学期", "2022-2023学年");
             if (scoreForOneTerm==null) {
                 continue;
             }
             List<Score.ScoreForOneClass> clazz_list = scoreForOneTerm.clazz_list;
             for (int j = 0; j < clazz_list.size(); j++) {
                 Score.ScoreForOneClass scoreForOneClass = clazz_list.get(j);
-                int c = j * 3 + 4;
+                int c = j * 3 + 5;
                 row.createCell(c).setCellValue(scoreForOneClass.courseName);
                 row.createCell(c+1).setCellValue(scoreForOneClass.credit);
                 row.createCell(c+2).setCellValue(scoreForOneClass.effectiveScore);
@@ -242,9 +254,10 @@ public class Main {
             Integer rown = number.get(String.valueOf(studentWithMoreInfo.id));
             Row row1 = sheet.getRow(rown);
             short lastCellNum = sheet.getRow(rown).getLastCellNum();
-            row1.createCell(lastCellNum + 1).setCellValue(v);
-            row1.createCell(lastCellNum + 2).setCellValue(gpa);
-            row.createCell(5).setCellValue(gpa);
+            row1.createCell(lastCellNum).setCellValue(v1);
+            row1.createCell(lastCellNum + 1).setCellValue(v2);
+            row1.createCell(lastCellNum + 2).setCellValue(vt);
+            row.createCell(4).setCellValue(v2);
             System.out.println(sb);
         }
 
@@ -254,6 +267,46 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        for (String string : strings) {
+            System.out.println(string);
+        }
+    }
+
+    private static StudentWithMoreInfo getI1(String s) {
+        StudentWithMoreInfo stu;
+        try {
+            stu = Student.requestStudent(s,0);
+        } catch (Exception e) {
+            String x = s + " StudentException---------";
+            strings.add(x);
+            System.out.println(x);
+            return null;
+        }
+        if(stu == null){
+            String x = s + " Student_null----------";
+            strings.add(x);
+            System.out.println(x);
+            return null;
+        }
+        stu.id = s;
+        stu.requestScore(0);
+        Score score = stu.getScore();
+        if(score == null) {
+            String x = stu.name + " NONSCORE---------";
+            strings.add(x);
+            System.out.println(x);
+            return null;
+        }
+        double avengeScore = score.countAvengeScore("第一学期","2022-2023学年");
+        System.out.println(s+"已读取++++++++");
+        try {
+            if(avengeScore > 0) {
+                return stu;
+            }
+        } catch (Exception e) {
+            System.out.println(s+" "+ e.getLocalizedMessage());
+        }
+        return null;
     }
 
     /**
@@ -266,13 +319,13 @@ public class Main {
         while (true){
             String line = scanner.nextLine();
             if(line.equalsIgnoreCase("#end"))break;
-            if(!line.contains("2")) line = Student.getStudentIdByName(line);
-            if(line == null) continue;
-            Student.StudentWithMoreInfo student = Student.requestStudent(Integer.parseInt(line));
+            //if(!line.contains("2")) line = Student.getStudentIdByName(line);
+            //if(line == null) continue;
+            Student.StudentWithMoreInfo student = Student.requestStudent(line,0);
 
             if(student!=null) {
                 list.add(student);
-                if(DEBUG)
+//                if(DEBUG)
                     student.showAllClass();
             } else System.out.println(line + " 未能识别！");
         }
@@ -283,6 +336,7 @@ public class Main {
             for (int week = 1; week <= 18; week++) {
                 for (int day = 1; day <= 7; day++) {
                     count.addAll(countDayCalendar(list, week, day));
+                    System.out.println(count.size());
                 }
             }
             IcsFileParser.outputIcsFileFromEvent(count,"count");
@@ -346,6 +400,7 @@ public class Main {
         for (Student student : list) {
             classesByWeek.addAll(student.getClassesByWeek(week_quest, String.valueOf(student.id)));
         }
+//        System.out.println("1: "+classesByWeek.size());
         List<Class.ClassOfAStudent> classesByDay = new ArrayList<>();
         for (Class.ClassOfAStudent aClass : classesByWeek) {
             if (aClass.class_time.week_day== weekday_quest) {
@@ -354,6 +409,7 @@ public class Main {
                     aClass.show();
             }
         }
+//        System.out.println("2: "+classesByDay.size());
         class Data {
             int num;
             final StringBuilder info = new StringBuilder();
@@ -375,7 +431,7 @@ public class Main {
                 if(value.tp.isIn(aClass.class_time.time_period)){
                     Data aData = data.getOrDefault(value, new Data());
                     aData.num ++;
-                    if(Student.students_info.containsKey(aClass.owner)) {
+                    if(Student.students_info != null && Student.students_info.containsKey(aClass.owner)) {
                         JSONObject stdnt_info = Student.students_info.getJSONObject(aClass.owner);
                         aData.info.append(StringUtils.rightPad(stdnt_info.getString("class"), 9, ' ')).append(' ');
                         aData.info.append("\t");
@@ -397,6 +453,7 @@ public class Main {
                     aData.info.append(aClass.class_name);
                     aData.info.append("\n");
                     data.put(value,aData);
+                    System.out.println("Data++");
                 }
             }
         }
@@ -426,7 +483,7 @@ public class Main {
                     }
                     Student.StudentWithMoreInfo student = null;
                     try {
-                        student = Student.requestStudent(id);
+                        student = Student.requestStudent(id,0);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

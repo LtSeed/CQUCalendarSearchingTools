@@ -30,7 +30,7 @@ public class RequestTool {
      * @param header header
      * @return result, null when can not connect to Internet
      */
-     public static String doGet(String url, Map<String, String> header) {
+     public static String doGet(String url, Map<String, String> header,int stack) {
 
         // 创建Httpclient对象
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -56,8 +56,9 @@ public class RequestTool {
                 System.out.println(e.getLocalizedMessage());
                 return null;
             } catch (IOException e) {
-                System.out.println("网络连接失败，请检查网络！");
-                return null;
+                if(stack == 20) return null;
+                System.out.println("网络连接失败，正在重试 次数：第"+ ++stack +"次！");
+                return doPOST(url,header,stack);
             }
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -111,8 +112,9 @@ public class RequestTool {
                 System.out.println(e.getLocalizedMessage());
                 return null;
             } catch (IOException e) {
-                System.out.println("网络连接失败，请检查网络！");
-                return null;
+                System.out.println("网络连接失败，正在重试 次数：第1次！");
+                return doPOST(url,header,1);
+
             }
             // 判断返回状态是否为200
             if (response.getStatusLine().getStatusCode() == 200) {
@@ -147,6 +149,63 @@ public class RequestTool {
         return ImageIO.read(httpUrl.getInputStream());
 
     }
+
+    /**
+     * 发送get请求
+     *
+     * @param url   请求URL
+     * @param header header
+     * @return result, null when can not connect to Internet
+     */
+    public static String doPOST(String url, Map<String, String> header, int stack) {
+
+        // 创建Httpclient对象
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+
+        String resultString = "";
+        CloseableHttpResponse response = null;
+        try {
+            // 创建uri
+            URIBuilder builder = new URIBuilder(url);
+            URI uri = builder.build();
+            // 创建http GET请求
+            HttpPost httpPost = new HttpPost(uri);
+            if (header != null) {
+                for (String key : header.keySet()) {
+                    httpPost.setHeader(key, header.get(key));
+                }
+            }
+
+            // 执行请求
+            try {
+                response = httpClient.execute(httpPost);
+            } catch (ClientProtocolException e){
+                System.out.println(e.getLocalizedMessage());
+                return null;
+            } catch (IOException e) {
+                if(stack == 10) return null;
+                System.out.println("网络连接失败，正在重试 次数：第"+ ++stack +"次！");
+                return doPOST(url,header,stack);
+            }
+            // 判断返回状态是否为200
+            if (response.getStatusLine().getStatusCode() == 200) {
+                resultString = EntityUtils.toString(response.getEntity(), "UTF-8");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (response != null) {
+                    response.close();
+                }
+                httpClient.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return resultString;
+    }
+
 
 }
 

@@ -15,12 +15,26 @@ public class Score {
         double result = 0;
         double credit = 0;
         for (ScoreForOneTerm term : terms) {
-            if(term.termName.equals(termName)&&term.year.equals(year)){
+            if((term.termName.equals(termName)||termName.equals(""))&&term.year.equals(year)){
                 for (ScoreForOneClass scoreForOneClass : term.clazz_list) {
-                    result += scoreForOneClass.credit * scoreForOneClass.effectiveScore;
-                    if(scoreForOneClass.effectiveScore != 0) credit+=scoreForOneClass.credit;
+                    double score = scoreForOneClass.effectiveScore;
+                    if(score != -1) {
+                        result += scoreForOneClass.credit * score;
+                        credit+=scoreForOneClass.credit;
+                    }
                 }
             }
+//            if((!term.termName.equals(termName))&&term.year.equals(year)){
+//                for (ScoreForOneClass scoreForOneClass : term.clazz_list) {
+//                    if(scoreForOneClass.courseName.contains("金工实习")) {
+//                        double score = scoreForOneClass.effectiveScore;
+//                        if (score != -1) {
+//                            result += scoreForOneClass.credit * score;
+//                            credit += scoreForOneClass.credit;
+//                        }
+//                    }
+//                }
+//            }
         }
         return result / credit;
     }
@@ -91,7 +105,7 @@ public class Score {
             Double effectiveScore1 = s.getDouble("effectiveScore");
             if(effectiveScore1 != null)
                 this.effectiveScore = effectiveScore1;
-            else this.effectiveScore = 0;
+            else this.effectiveScore = -1;
             this.examType = s.getString("examType");
             this.programType = s.getString("programType");
         }

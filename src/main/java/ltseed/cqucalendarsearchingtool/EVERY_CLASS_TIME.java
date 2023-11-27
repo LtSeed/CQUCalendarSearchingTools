@@ -20,48 +20,10 @@ public enum EVERY_CLASS_TIME {
 
     public static EVERY_CLASS_TIME getClassTime(int number){
         if(number<1||number>13) throw new IllegalArgumentException("错误地查询了非法的课程时间");
-        switch (number){
-            case 1 -> {
-                return C1;
-            }
-            case 2 -> {
-                return C2;
-            }
-            case 3 -> {
-                return C3;
-            }
-            case 4 -> {
-                return C4;
-            }
-            case 5 -> {
-                return C5;
-            }
-            case 6 -> {
-                return C6;
-            }
-            case 7 -> {
-                return C7;
-            }
-            case 8 -> {
-                return C8;
-            }
-            case 9 -> {
-                return C9;
-            }
-            case 10 -> {
-                return C10;
-            }
-            case 11 -> {
-                return C11;
-            }
-            case 12 -> {
-                return C12;
-            }
-            case 13 -> {
-                return C13;
-            }
-            default -> throw new IllegalArgumentException();
+        for (EVERY_CLASS_TIME value : EVERY_CLASS_TIME.values()) {
+            if(value.name().contains(String.valueOf(number))) return value;
         }
+        throw new IllegalArgumentException("错误地查询了非法的课程时间");
     }
 
     EVERY_CLASS_TIME(int i, int start, int end) {

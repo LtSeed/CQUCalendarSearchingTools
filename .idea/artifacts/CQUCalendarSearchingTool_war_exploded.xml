@@ -14,6 +14,40 @@
           <element id="module-output" name="CQUCalendarSearchingTool" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-java:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-api:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-chrome-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-edge-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-firefox-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-ie-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-opera-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-remote-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-safari-driver:3.141.59" />
+          <element id="library" level="project" name="Maven: org.seleniumhq.selenium:selenium-support:3.141.59" />
+          <element id="library" level="project" name="Maven: net.bytebuddy:byte-buddy:1.8.15" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-exec:1.3" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:25.0-jre" />
+          <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:1.3.9" />
+          <element id="library" level="project" name="Maven: org.checkerframework:checker-compat-qual:2.0.0" />
+          <element id="library" level="project" name="Maven: com.google.errorprone:error_prone_annotations:2.1.3" />
+          <element id="library" level="project" name="Maven: com.google.j2objc:j2objc-annotations:1.1" />
+          <element id="library" level="project" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.14" />
+          <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:3.11.0" />
+          <element id="library" level="project" name="Maven: com.squareup.okio:okio:1.14.0" />
+          <element id="library" level="project" name="Maven: net.lightbody.bmp:browsermob-core:2.1.5" />
+          <element id="library" level="project" name="Maven: net.lightbody.bmp:littleproxy:1.1.0-beta-bmp-17" />
+          <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.5" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.9" />
+          <element id="library" level="project" name="Maven: dnsjava:dnsjava:2.1.8" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.25" />
+          <element id="library" level="project" name="Maven: org.slf4j:jcl-over-slf4j:1.7.25" />
+          <element id="library" level="project" name="Maven: com.jcraft:jzlib:1.1.3" />
+          <element id="library" level="project" name="Maven: io.netty:netty-all:4.0.51.Final" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.58" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.58" />
+          <element id="library" level="project" name="Maven: net.lightbody.bmp:mitm:2.1.5" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.12.3" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.2" />
           <element id="library" level="project" name="Maven: org.apache.poi:poi:5.2.3" />
           <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.15" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-collections4:4.4" />
@@ -26,9 +60,6 @@
           <element id="library" level="project" name="Maven: org.apache.xmlbeans:xmlbeans:5.1.1" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-compress:1.21" />
           <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:1.07" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.14.2" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.14.2" />
           <element id="library" level="project" name="Maven: org.apache.poi:poi-scratchpad:5.2.3" />
           <element id="library" level="project" name="Maven: com.alibaba:easyexcel:3.1.1" />
           <element id="library" level="project" name="Maven: com.alibaba:easyexcel-core:3.1.1" />
@@ -36,14 +67,12 @@
           <element id="library" level="project" name="Maven: org.apache.poi:poi-ooxml-schemas:4.1.2" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-csv:1.8" />
           <element id="library" level="project" name="Maven: org.ehcache:ehcache:3.9.9" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.32" />
           <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.47" />
           <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" />
           <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.2" />
           <element id="library" level="project" name="Maven: org.python:jython-standalone:2.7.0" />
           <element id="library" level="project" name="Maven: org.mnode.ical4j:ical4j-zoneinfo-outlook:2.1.4" />
           <element id="library" level="project" name="Maven: org.mnode.ical4j:ical4j:4.0.0-beta1" />
-          <element id="library" level="project" name="Maven: org.apache.commons:commons-lang3:3.12.0" />
           <element id="library" level="project" name="Maven: commons-validator:commons-validator:1.7" />
           <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.4" />
           <element id="library" level="project" name="Maven: commons-digester:commons-digester:2.1" />
@@ -51,7 +80,7 @@
           <element id="library" level="project" name="Maven: org.threeten:threeten-extra:1.7.0" />
           <element id="library" level="project" name="Maven: org.jooq:jool-java-8:0.9.14" />
           <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.4.14" />
-          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.18.26" />
+          <element id="library" level="project" name="Maven: org.projectlombok:lombok:1.18.30" />
         </element>
       </element>
       <element id="directory" name="META-INF">

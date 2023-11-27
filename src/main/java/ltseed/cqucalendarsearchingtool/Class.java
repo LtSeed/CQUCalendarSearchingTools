@@ -20,6 +20,8 @@ public class Class {
     String[] teacher;
     JSONObject origen_info;
 
+
+
     public static class ClassOfAStudent extends Class{
         String owner;
 
@@ -77,7 +79,7 @@ public class Class {
 
     public Class(JSONObject jsonObject) {
         origen_info = jsonObject;
-        classroom = jsonObject.getString("roomName");
+        classroom = jsonObject.getString("roomBuildingCampusName");
         class_name = jsonObject.getString("courseName");
         JSONArray teachers = jsonObject.getJSONArray("classTimetableInstrVOList");
         int teacher_amount = teachers.size();
@@ -98,6 +100,21 @@ public class Class {
         System.out.println("classroom: " + classroom);
         System.out.println("teacher: " + Arrays.toString(teacher));
         class_time.show();
+    }
+
+    @Override
+    public String toString() {
+        String[] teacher_with_quo = teacher;
+        for (int i = 0, teacher_with_quoLength = teacher_with_quo.length; i < teacher_with_quoLength; i++) {
+            teacher_with_quo[i] = "\"" + teacher_with_quo[i] + "\"";
+        }
+        return "{" +
+                "'class_time':" + class_time +
+                ", 'classroom':'" + classroom + '\'' +
+                ", 'class_name':'" + class_name + '\'' +
+                ", 'teacher':" + Arrays.toString(teacher) +
+                ", 'origen_info':" + origen_info +
+                '}';
     }
 
     @Override
