@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 
 import com.alibaba.fastjson.JSONArray;
@@ -10,8 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static ltseed.cqucalendarsearchingtool.IcsFileParser.getClassEvent;
-import static ltseed.cqucalendarsearchingtool.IcsFileParser.getDayEvent;
+import static ltseed.cqucalendarsearchingtool.cct.IcsFileParser.getClassEvent;
+import static ltseed.cqucalendarsearchingtool.cct.IcsFileParser.getDayEvent;
 
 public class Class {
     ClassTime class_time;

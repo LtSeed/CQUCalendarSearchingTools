@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
@@ -16,8 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static ltseed.cqucalendarsearchingtool.CourseDownloader.downloadAndSaveCourses;
-import static ltseed.cqucalendarsearchingtool.Student.*;
+import static ltseed.cqucalendarsearchingtool.cct.CourseDownloader.downloadAndSaveCourses;
+import static ltseed.cqucalendarsearchingtool.cct.Student.*;
 
 @SuppressWarnings({"unused", "SpellCheckingInspection"})
 public class Main {

@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.Objects;
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
 
-import static ltseed.cqucalendarsearchingtool.Student.requestStudentClasses;
+import static ltseed.cqucalendarsearchingtool.cct.Student.requestStudentClasses;
 
 public class SimpleHttpServer {
     public static final File ICS_FOLDER = new File("E:\\SERVER\\ics-out");

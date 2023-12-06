@@ -1,15 +1,14 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static ltseed.cqucalendarsearchingtool.SimpleHttpServer.Class_FOLDER;
-import static ltseed.cqucalendarsearchingtool.Student.requestStudentClasses;
+import static ltseed.cqucalendarsearchingtool.cct.SimpleHttpServer.Class_FOLDER;
+import static ltseed.cqucalendarsearchingtool.cct.Student.requestStudentClasses;
 
 public class CourseDownloader {
 

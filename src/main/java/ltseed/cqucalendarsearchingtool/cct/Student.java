@@ -1,6 +1,5 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
-import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.annotation.ExcelIgnore;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.alibaba.fastjson.JSON;
@@ -11,13 +10,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
-import org.apache.poi.xssf.usermodel.XSSFPicture;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
-import static ltseed.cqucalendarsearchingtool.Main.*;
+import static ltseed.cqucalendarsearchingtool.cct.Main.*;
 
 @Getter
 public class Student {

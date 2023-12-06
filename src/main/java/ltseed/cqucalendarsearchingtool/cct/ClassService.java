@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import javax.ws.rs.*;
 import java.io.File;
@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-import static ltseed.cqucalendarsearchingtool.Student.requestStudentClasses;
+import static ltseed.cqucalendarsearchingtool.cct.Student.requestStudentClasses;
 
 @Path("/class")
 public class ClassService {

@@ -1,7 +1,7 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
-import static ltseed.cqucalendarsearchingtool.SeleniumLogin.checkLogin;
-import static ltseed.cqucalendarsearchingtool.SeleniumLogin.login;
+import static ltseed.cqucalendarsearchingtool.cct.SeleniumLogin.checkLogin;
+import static ltseed.cqucalendarsearchingtool.cct.SeleniumLogin.login;
 
 @SuppressWarnings({"InfiniteLoopStatement", "BusyWait"})
 class CheckLoginThread extends Thread {

@@ -1,10 +1,10 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
-import static ltseed.cqucalendarsearchingtool.ClassTime.encodeTime;
-import static ltseed.cqucalendarsearchingtool.EVERY_CLASS_TIME.getClassTime;
+import static ltseed.cqucalendarsearchingtool.cct.ClassTime.encodeTime;
+import static ltseed.cqucalendarsearchingtool.cct.EVERY_CLASS_TIME.getClassTime;
 
 public class TimePeriod {
 

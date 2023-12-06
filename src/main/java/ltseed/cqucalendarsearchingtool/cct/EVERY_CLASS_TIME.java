@@ -1,4 +1,4 @@
-package ltseed.cqucalendarsearchingtool;
+package ltseed.cqucalendarsearchingtool.cct;
 
 public enum EVERY_CLASS_TIME {
     C1(1, 830, 915),

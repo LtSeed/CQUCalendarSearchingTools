@@ -47,7 +47,6 @@
           <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.58" />
           <element id="library" level="project" name="Maven: net.lightbody.bmp:mitm:2.1.5" />
           <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.12.3" />
-          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.2" />
           <element id="library" level="project" name="Maven: org.apache.poi:poi:5.2.3" />
           <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.15" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-collections4:4.4" />
@@ -60,6 +59,7 @@
           <element id="library" level="project" name="Maven: org.apache.xmlbeans:xmlbeans:5.1.1" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-compress:1.21" />
           <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:1.07" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.14.2" />
           <element id="library" level="project" name="Maven: org.apache.poi:poi-scratchpad:5.2.3" />
           <element id="library" level="project" name="Maven: com.alibaba:easyexcel:3.1.1" />
           <element id="library" level="project" name="Maven: com.alibaba:easyexcel-core:3.1.1" />
